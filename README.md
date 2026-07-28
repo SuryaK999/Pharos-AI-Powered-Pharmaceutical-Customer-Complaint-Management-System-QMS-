@@ -1,9 +1,10 @@
 <div align="center">
 
-# ⚓ Pharos ⭐
-### **AI-Powered Pharmaceutical Customer Complaint Management System (QMS)**
+<img src="frontend/public/pharos-logo.svg" alt="Pharos Logo" width="130" />
 
-> *"Every complaint is a beacon."*
+# ⚓ Pharos | AI-Powered Quality Intelligence & QMS
+
+> **Autonomous multi-agent orchestration engine for pharmaceutical complaint intake, ICH Q9 risk classification, and regulatory CAPA recommendations.**
 
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115.6-009688.svg?style=for-the-badge&logo=fastapi)](https://fastapi.tiangolo.com/)
 [![React](https://img.shields.io/badge/React-18.3-61DAFB.svg?style=for-the-badge&logo=react)](https://react.dev/)

@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%">
+  <defs>
+    <!-- Background Transparent -->
+    <linearGradient id="beaconGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0EA5E9" />
+      <stop offset="50%" stop-color="#3B82F6" />
+      <stop offset="100%" stop-color="#6366F1" />
+    </linearGradient>
+    
+    <linearGradient id="pharmaEmerald" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#059669" />
+      <stop offset="100%" stop-color="#10B981" />
+    </linearGradient>
+
+    <linearGradient id="aiRay" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8" stop-opacity="0.9" />
+      <stop offset="100%" stop-color="#818CF8" stop-opacity="0.2" />
+    </linearGradient>
+
+    <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <g transform="translate(250, 240)">
+    <!-- Light Beam Rays (AI Emission) -->
+    <polygon points="0,-130 -140,-210 140,-210" fill="url(#aiRay)" opacity="0.45" />
+    <polygon points="0,-130 -80,-210 80,-210" fill="url(#aiRay)" opacity="0.75" />
+
+    <!-- Pulse Rings (QMS Compliance / Radar) -->
+    <circle cx="0" cy="-125" r="160" fill="none" stroke="#0EA5E9" stroke-width="1.5" stroke-dasharray="4,8" opacity="0.3" />
+    <circle cx="0" cy="-125" r="110" fill="none" stroke="#3B82F6" stroke-width="2" stroke-dasharray="8,6" opacity="0.4" />
+
+    <!-- Outer Protective Shield / Diamond (Pharmaceutical Security) -->
+    <path d="M 0,-190 L 110,-70 L 110,60 L 0,160 L -110,60 L -110,-70 Z" 
+          fill="none" stroke="url(#beaconGlow)" stroke-width="6" stroke-linejoin="round" opacity="0.95" />
+
+    <!-- Inner DNA Helix / Molecular Nodes (Life Sciences) -->
+    <path d="M -50,-60 Q 0,-30 50,0 Q -0,30 -50,60" fill="none" stroke="url(#pharmaEmerald)" stroke-width="4" opacity="0.8" />
+    <path d="M 50,-60 Q 0,-30 -50,0 Q 0,30 50,60" fill="none" stroke="url(#beaconGlow)" stroke-width="4" opacity="0.8" />
+
+    <!-- Nodes -->
+    <circle cx="-50" cy="-60" r="6" fill="#10B981" />
+    <circle cx="50" cy="-60" r="6" fill="#0EA5E9" />
+    <circle cx="0" cy="0" r="8" fill="#6366F1" filter="url(#softGlow)" />
+    <circle cx="-50" cy="60" r="6" fill="#0EA5E9" />
+    <circle cx="50" cy="60" r="6" fill="#10B981" />
+
+    <!-- Central Pharos Lighthouse Spire -->
+    <path d="M -22,110 L -14,-110 L 14,-110 L 22,110 Z" fill="url(#beaconGlow)" />
+    
+    <!-- Lighthouse Base & Details -->
+    <rect x="-35" y="110" width="70" height="14" rx="4" fill="#1E293B" stroke="url(#beaconGlow)" stroke-width="2" />
+    
+    <!-- Light Lantern / Beacon Head -->
+    <path d="M -26,-110 L -28,-135 L 0,-155 L 28,-135 L 26,-110 Z" fill="#0EA5E9" />
+    <circle cx="0" cy="-128" r="14" fill="#FFFFFF" filter="url(#softGlow)" />
+    <circle cx="0" cy="-128" r="7" fill="#38BDF8" />
+
+    <!-- Medical Cross Core -->
+    <path d="M -5,-30 H 5 V -10 H -5 Z M -15,-25 H 15 V -15 H -15 Z" fill="#FFFFFF" opacity="0.9" />
+  </g>
+</svg>
