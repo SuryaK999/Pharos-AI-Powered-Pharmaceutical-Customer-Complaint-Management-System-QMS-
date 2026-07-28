@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
 import { NavLink, useLocation, Link } from 'react-router-dom'
 import {
-  LayoutDashboard, ClipboardList, FilePlus2, Activity, ShieldCheck,
-  ChevronsLeft, Wrench, BarChart3, Settings, Sparkles,
+  LayoutDashboard, ClipboardList, FilePlus2, ShieldCheck,
+  ChevronsLeft, Sparkles,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -18,13 +18,6 @@ const SECTIONS = [
       { to: '/complaints/new', label: 'Log Complaint', icon: FilePlus2, accent: true },
     ],
   },
-  {
-    label: 'Insights',
-    items: [
-      { label: 'CAPA Tracker', icon: Wrench, soon: true },
-      { label: 'Reports & Analytics', icon: BarChart3, soon: true },
-    ],
-  },
 ]
 
 const TITLES = {
@@ -35,62 +28,37 @@ const TITLES = {
 
 function Logo({ collapsed }) {
   return (
-    <Link to="/" className="group flex items-center gap-3 px-3 py-5 lg:px-4">
-      <span className="relative grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-brand to-brand-glow shadow-[0_4px_20px_rgba(23,160,140,.35)] transition-transform duration-300 group-hover:scale-105">
-        <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none">
-          <path d="M3 14h4l2.5-7 4 10 2.5-5H21" stroke="#CCFBF1" strokeWidth="2.2"
-            strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-        <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full border-2 border-pine bg-emerald-400" />
-      </span>
-      <span className={cn('min-w-0 transition-all duration-300', collapsed ? 'lg:opacity-0 lg:w-0' : 'lg:opacity-100')}>
-        <span className="block truncate font-display text-[17px] font-bold tracking-tight text-white">
-          Pharos<span className="text-brand-glow">.</span>
-        </span>
-        <span className="block text-[9px] font-semibold uppercase tracking-[.28em] text-white/35">
-          QMS · Complaints
-        </span>
-      </span>
+    <Link to="/" className={cn("group flex items-center px-4 py-5", collapsed ? "justify-center px-0" : "gap-3")}>
+      <img 
+        src="/logo.png" 
+        alt="Pharos Logo" 
+        className={cn("object-contain transition-all duration-300", collapsed ? "h-7 w-7" : "h-8")} 
+      />
     </Link>
   )
 }
 
 function NavItem({ item, collapsed }) {
-  const { to, label, icon: Icon, end, accent, soon } = item
-
-  if (soon) {
-    return (
-      <div className="group relative flex cursor-not-allowed items-center gap-3 rounded-lg px-3 py-2 text-[13px] font-medium text-white/25">
-        <Icon className="h-[17px] w-[17px] shrink-0" strokeWidth={1.8} />
-        <span className={cn('flex-1 truncate transition-all duration-300', collapsed && 'lg:hidden')}>{label}</span>
-        {!collapsed && <span className="hidden rounded-full border border-white/10 px-1.5 py-px text-[8px] font-bold uppercase tracking-wider text-white/30 lg:inline">Soon</span>}
-        {collapsed && (
-          <span className="pointer-events-none absolute left-full top-1/2 z-50 ml-3 hidden -translate-y-1/2 whitespace-nowrap rounded-md border border-white/10 bg-[#16211d] px-2.5 py-1.5 text-[11px] font-medium text-white/80 shadow-xl group-hover:block">
-            {label} · Soon
-          </span>
-        )}
-      </div>
-    )
-  }
+  const { to, label, icon: Icon, end, accent } = item
 
   return (
     <NavLink to={to} end={end}
       className={({ isActive }) => cn(
         'group relative flex items-center gap-3 rounded-lg px-3 py-2 text-[13px] font-medium transition-all duration-200',
-        isActive ? 'bg-white/[0.07] text-white' : 'text-white/45 hover:bg-white/[0.04] hover:text-white/85')}>
+        isActive ? 'bg-brand/10 text-brand-dark' : 'text-ink/60 hover:bg-ink/5 hover:text-ink')}>
       {({ isActive }) => (
         <>
-          <span className={cn('absolute left-0 top-1/2 h-4 w-[2.5px] -translate-y-1/2 rounded-r-full bg-brand-glow transition-all duration-300',
+          <span className={cn('absolute left-0 top-1/2 h-4 w-[2.5px] -translate-y-1/2 rounded-r-full bg-brand transition-all duration-300',
             isActive ? 'opacity-80' : 'opacity-0')} />
           <Icon className={cn('h-[17px] w-[17px] shrink-0 transition-colors duration-200',
-            isActive ? 'text-brand-glow' : 'text-white/40 group-hover:text-white/70',
-            accent && !isActive && 'text-white/40')} strokeWidth={1.9} />
+            isActive ? 'text-brand' : 'text-ink/40 group-hover:text-ink/70',
+            accent && !isActive && 'text-ink/40')} strokeWidth={1.9} />
           <span className={cn('flex-1 truncate transition-all duration-300', collapsed && 'lg:hidden')}>{label}</span>
           {accent && !collapsed && (
-            <Sparkles className="hidden h-3 w-3 text-brand-glow/60 lg:block" />
+            <Sparkles className="hidden h-3 w-3 text-brand/60 lg:block" />
           )}
           {collapsed && (
-            <span className="pointer-events-none absolute left-full top-1/2 z-50 ml-3 hidden -translate-y-1/2 whitespace-nowrap rounded-md border border-white/10 bg-[#16211d] px-2.5 py-1.5 text-[11px] font-medium text-white/80 shadow-xl group-hover:block">
+            <span className="pointer-events-none absolute left-full top-1/2 z-50 ml-3 hidden -translate-y-1/2 whitespace-nowrap rounded-md border border-ink/10 bg-white px-2.5 py-1.5 text-[11px] font-medium text-ink shadow-xl group-hover:block">
               {label}
             </span>
           )}
@@ -112,11 +80,8 @@ export default function AppShell({ children }) {
     <div className="flex min-h-screen">
       {/* ═══ SIDEBAR ═══ */}
       <aside className={cn(
-        'fixed inset-y-0 left-0 z-40 flex flex-col border-r border-white/[0.06] bg-pine transition-all duration-300 ease-[cubic-bezier(.4,0,.2,1)]',
+        'fixed inset-y-0 left-0 z-40 flex flex-col border-r border-ink/10 bg-bone transition-all duration-300 ease-[cubic-bezier(.4,0,.2,1)]',
         collapsed ? 'w-[76px]' : 'w-[76px] lg:w-[264px]')}>
-
-        {/* subtle top glow */}
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-brand/[0.08] to-transparent" />
 
         {/* collapse toggle — attached to edge */}
         <button onClick={() => setCollapsed((c) => !c)}
@@ -131,7 +96,7 @@ export default function AppShell({ children }) {
         <nav className="relative flex-1 space-y-5 overflow-y-auto px-3 pb-4 pt-2">
           {SECTIONS.map((section) => (
             <div key={section.label}>
-              <p className={cn('mb-1.5 px-3 text-[9px] font-bold uppercase tracking-[.22em] text-white/25 transition-all duration-300',
+              <p className={cn('mb-1.5 px-3 text-[9px] font-bold uppercase tracking-[.22em] text-ink/40 transition-all duration-300',
                 collapsed && 'lg:opacity-0 lg:h-0 lg:mb-0 lg:overflow-hidden')}>
                 {section.label}
               </p>
@@ -141,55 +106,21 @@ export default function AppShell({ children }) {
             </div>
           ))}
         </nav>
-
-        {/* engine status */}
-        <div className={cn('px-3 pb-3 transition-all duration-300', collapsed && 'lg:px-2')}>
-          <div className={cn('rounded-xl border border-white/[0.07] bg-white/[0.03] transition-all duration-300',
-            collapsed ? 'lg:p-2' : 'p-3')}>
-            <div className="flex items-center gap-2">
-              <span className="relative flex h-2 w-2 shrink-0">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-50" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
-              </span>
-              <span className={cn('text-[11px] font-semibold text-white/75 transition-all duration-300', collapsed && 'lg:hidden')}>
-                AI Engine Online
-              </span>
-            </div>
-            <p className={cn('mt-1.5 font-mono text-[9.5px] leading-relaxed text-white/30 transition-all duration-300', collapsed && 'lg:hidden')}>
-              Groq · gemma2-9b-it<br />llama-3.3-70b-versatile
-            </p>
-          </div>
-        </div>
-
-        {/* user */}
-        <div className="border-t border-white/[0.06] p-3">
-          <div className={cn('flex items-center gap-2.5 rounded-lg transition-all duration-300', collapsed ? 'lg:justify-center' : 'lg:px-2')}>
-            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-gradient-to-br from-brand to-brand-glow text-[11px] font-bold text-white ring-2 ring-white/10">
-              S
-            </span>
-            <span className={cn('min-w-0 transition-all duration-300', collapsed && 'lg:hidden')}>
-              <span className="block truncate text-[12.5px] font-semibold text-white/85">Surya</span>
-              <span className="block text-[10px] text-white/35">QA Officer · Admin</span>
-            </span>
-            <Settings className={cn('ml-auto h-3.5 w-3.5 shrink-0 text-white/25 transition-all duration-300 hover:text-white/60', collapsed && 'lg:hidden')} />
-          </div>
-        </div>
       </aside>
 
       {/* ═══ MAIN ═══ */}
       <div className={cn('flex min-h-screen flex-1 flex-col transition-[margin] duration-300 ease-[cubic-bezier(.4,0,.2,1)]',
         collapsed ? 'ml-[76px]' : 'ml-[76px] lg:ml-[264px]')}>
-        <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-ink/[0.07] bg-bone/85 px-6 backdrop-blur-md lg:px-8">
+        <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-ink/[0.07] bg-white/85 px-6 backdrop-blur-md lg:px-8">
           <div>
             <p className="text-[9px] font-bold uppercase tracking-[.22em] text-brand">Pharos Quality Suite</p>
             <h1 className="font-display text-[17px] font-bold leading-tight tracking-tight">{title}</h1>
           </div>
           <div className="flex items-center gap-3">
-            <span className="hidden rounded-full border border-ink/10 bg-white px-3 py-1 font-mono text-[11px] text-ink/55 sm:block">{today}</span>
+            <span className="hidden rounded-full border border-ink/10 bg-bone px-3 py-1 font-mono text-[11px] text-ink/60 sm:block">{today}</span>
             <span className="hidden items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[10px] font-semibold text-emerald-700 md:flex">
               <ShieldCheck className="h-3 w-3" /> ICH Q9 · 21 CFR 211.198
             </span>
-            <span className="grid h-9 w-9 place-items-center rounded-full bg-brand text-xs font-bold text-white ring-2 ring-brand/20">S</span>
           </div>
         </header>
         <main className="dotgrid flex-1 bg-gradient-to-b from-white/50 to-transparent px-6 py-7 lg:px-8">{children}</main>
