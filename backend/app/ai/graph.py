@@ -26,16 +26,22 @@ class ChatState(TypedDict, total=False):
     action: str
 
 
-def _tok(text: str):
+def _to_str(val) -> str:
+    if isinstance(val, list):
+        return " ".join(str(v) for v in val)
+    return str(val) if val is not None else ""
+
+
+def _tok(text):
     return set(
-        w for w in re.findall(r"[a-z0-9]{3,}", (text or "").lower())
+        w for w in re.findall(r"[a-z0-9]{3,}", _to_str(text).lower())
         if w not in {"the", "and", "with", "for", "was", "were", "that", "this"}
     )
 
 
 def _find_duplicates(form: dict) -> list:
-    prod = (form.get("product_name") or "").lower()
-    batch = re.sub(r"[^a-z0-9]", "", (form.get("batch_number") or "").lower())
+    prod = _to_str(form.get("product_name")).lower()
+    batch = re.sub(r"[^a-z0-9]", "", _to_str(form.get("batch_number")).lower())
     desc_toks = _tok(form.get("description"))
     out = []
     db = SessionLocal()
