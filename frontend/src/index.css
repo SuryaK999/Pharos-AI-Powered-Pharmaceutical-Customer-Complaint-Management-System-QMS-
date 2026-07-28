@@ -27,3 +27,13 @@
 @keyframes pulseDot { 0%,100% { box-shadow: 0 0 0 0 rgba(220,38,38,.45); } 70% { box-shadow: 0 0 0 7px rgba(220,38,38,0); } }
 @keyframes barGrow { from { transform: scaleY(0); } to { transform: scaleY(1); } }
 @keyframes shimmer { 0% { background-position: 100% 0; } 100% { background-position: 0 0; } }
+
+/* ── chat typing indicator ── */
+.typing-dot {
+  @apply h-1.5 w-1.5 rounded-full bg-brand/60;
+  animation: typingBounce 1.2s infinite ease-in-out;
+}
+@keyframes typingBounce {
+  0%, 80%, 100% { transform: translateY(0); opacity: .35; }
+  40% { transform: translateY(-4px); opacity: 1; }
+}
