@@ -28,22 +28,23 @@ const TITLES = {
 
 function Logo({ collapsed }) {
   return (
-    <Link to="/" className="group flex items-center gap-3 px-3 py-5 lg:px-4">
-      <span className="relative grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-brand to-brand-glow shadow-glow transition-transform duration-300 group-hover:scale-105">
-        <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none">
-          <path d="M3 14h4l2.5-7 4 10 2.5-5H21" stroke="#EAF4FF" strokeWidth="2.2"
-            strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-        <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full border-2 border-pine bg-emerald-400" />
-      </span>
-      <span className={cn('min-w-0 transition-all duration-300', collapsed ? 'lg:opacity-0 lg:w-0' : 'lg:opacity-100')}>
-        <span className="block truncate font-display text-[17px] font-bold tracking-tight text-white">
-          Pharos<span className="text-brand-glow">.</span>
+    <Link to="/" className={cn("group flex items-center px-5 py-6", collapsed ? "justify-center px-0" : "gap-3.5")}>
+      <img 
+        src="/pharos-logo.svg" 
+        alt="Pharos Logo" 
+        className={cn("object-contain transition-transform duration-300 group-hover:scale-105", 
+          collapsed ? "h-10 w-10" : "h-[52px] w-[52px] shrink-0 drop-shadow-lg")} 
+      />
+      {!collapsed && (
+        <span className="min-w-0 flex-1 pt-0.5 transition-all duration-300">
+          <span className="block truncate font-display text-[20px] font-bold tracking-tight text-white leading-none">
+            Pharos<span className="text-brand-glow">.</span>
+          </span>
+          <span className="block mt-1.5 text-[9.5px] font-semibold uppercase tracking-[.26em] text-white/40 leading-none">
+            QMS · Complaints
+          </span>
         </span>
-        <span className="block text-[9px] font-semibold uppercase tracking-[.28em] text-white/35">
-          QMS · Complaints
-        </span>
-      </span>
+      )}
     </Link>
   )
 }

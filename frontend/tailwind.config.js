@@ -1,18 +1,15 @@
+import tailwindcssAnimate from 'tailwindcss-animate'
+
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ['./index.html', './src/**/*.{js,jsx}'],
   theme: {
     extend: {
       colors: {
-        bone: '#F4F8FC',
-        ink: '#0C2135',
-        pine: '#0A1526',
-        brand: {
-          DEFAULT: '#0A6ED1',
-          dark: '#08549F',
-          soft: '#E1EEFB',
-          glow: '#4FB8FF',
-        },
+        bone: '#F2F5F0',
+        ink: '#0F1F1B',
+        pine: '#0C1B17',
+        brand: { DEFAULT: '#0E5E52', dark: '#0A463E', soft: '#E3F1ED', glow: '#17A08C' },
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
@@ -20,11 +17,10 @@ export default {
         mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
       },
       boxShadow: {
-        card: '0 1px 2px rgba(12,33,53,.05), 0 4px 16px -6px rgba(12,33,53,.08)',
-        lift: '0 2px 4px rgba(12,33,53,.06), 0 14px 32px -10px rgba(10,110,209,.24)',
-        glow: '0 0 0 1px rgba(79,184,255,.25), 0 8px 28px -6px rgba(79,184,255,.45)',
+        card: '0 1px 2px rgba(15,31,27,.05), 0 4px 14px -6px rgba(15,31,27,.08)',
+        lift: '0 2px 4px rgba(15,31,27,.06), 0 12px 28px -10px rgba(14,94,82,.22)',
       },
     },
   },
-  plugins: [require('tailwindcss-animate')],
+  plugins: [tailwindcssAnimate],
 }
