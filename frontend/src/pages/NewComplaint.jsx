@@ -56,59 +56,72 @@ export default function NewComplaint() {
         <Card className="reveal">
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
-              Log Customer Complaint
-              {hasData && <Badge variant="soft"><Sparkles className="mr-1 h-3 w-3" /> AI-populated</Badge>}
+              <div>
+                Log Customer Complaint
+                <p className="mt-0.5 text-xs font-normal text-ink/50">API &amp; FDF Quality Assurance Module</p>
+              </div>
+              <Badge variant={hasData ? 'soft' : 'warning'} className="shrink-0">
+                {hasData ? <><Sparkles className="mr-1 h-3 w-3" /> AI-populated</> : 'Pending Triage'}
+              </Badge>
             </CardTitle>
-            <CardDescription>Populated by the Copilot via chat. Edit here or via prompts.</CardDescription>
           </CardHeader>
           <CardContent>
+            {/* ── Section 1: Origin & Customer Details ── */}
+            <p className="mb-3 text-[10px] font-bold uppercase tracking-[.16em] text-ink/40">1. Origin &amp; Customer Details</p>
             <div className="grid gap-4 sm:grid-cols-2">
-              <F label="Complainant Org" flash={chat.flashKeys.includes('complainant_org')}>
-                <Input value={f.complainant_org} onChange={(e) => dispatch(setField({ key: 'complainant_org', value: e.target.value }))} placeholder="Apollo Pharmacy" /></F>
-              <F label="Contact Name" flash={chat.flashKeys.includes('complainant_name')}>
-                <Input value={f.complainant_name} onChange={(e) => dispatch(setField({ key: 'complainant_name', value: e.target.value }))} /></F>
-              <F label="Email" flash={chat.flashKeys.includes('email')}>
-                <Input value={f.email} onChange={(e) => dispatch(setField({ key: 'email', value: e.target.value }))} /></F>
-              <F label="Country" flash={chat.flashKeys.includes('country')}>
-                <Input value={f.country} onChange={(e) => dispatch(setField({ key: 'country', value: e.target.value }))} /></F>
-              <F label="Product Name" flash={chat.flashKeys.includes('product_name')}>
-                <Input value={f.product_name} onChange={(e) => dispatch(setField({ key: 'product_name', value: e.target.value }))} placeholder="Amoxicillin Capsules" /></F>
-              <F label="Product Code" flash={chat.flashKeys.includes('product_code')}>
-                <Input value={f.product_code} onChange={(e) => dispatch(setField({ key: 'product_code', value: e.target.value }))} className="font-mono" /></F>
-              <F label="Strength" flash={chat.flashKeys.includes('product_strength')}>
-                <Input value={f.product_strength} onChange={(e) => dispatch(setField({ key: 'product_strength', value: e.target.value }))} placeholder="500 mg" /></F>
-              <F label="Batch / Lot No." flash={chat.flashKeys.includes('batch_number')}>
-                <Input value={f.batch_number} onChange={(e) => dispatch(setField({ key: 'batch_number', value: e.target.value }))} className="font-mono" /></F>
-              <F label="Grade" flash={chat.flashKeys.includes('grade')}>
-                <Input value={f.grade} onChange={(e) => dispatch(setField({ key: 'grade', value: e.target.value }))} placeholder="IP / BP / USP" /></F>
-              <F label="Mfg Date" flash={chat.flashKeys.includes('manufacturing_date')}>
-                <Input type="date" value={f.manufacturing_date} onChange={(e) => dispatch(setField({ key: 'manufacturing_date', value: e.target.value }))} /></F>
-              <F label="Expiry Date" flash={chat.flashKeys.includes('expiry_date')}>
-                <Input type="date" value={f.expiry_date} onChange={(e) => dispatch(setField({ key: 'expiry_date', value: e.target.value }))} /></F>
-              <F label="Dosage Form" flash={chat.flashKeys.includes('dosage_form')}>
-                <Input value={f.dosage_form} onChange={(e) => dispatch(setField({ key: 'dosage_form', value: e.target.value }))} /></F>
-              <F label="Complaint Type" flash={chat.flashKeys.includes('complaint_type')}>
-                <Select value={f.complaint_type} onValueChange={(v) => dispatch(setField({ key: 'complaint_type', value: v }))}>
-                  <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
-                  <SelectContent>{TYPES.map((t) => <SelectItem key={t} value={t} className="capitalize">{t.replace(/_/g, ' ')}</SelectItem>)}</SelectContent>
-                </Select></F>
-              <F label="Classification" flash={chat.flashKeys.includes('classification')}>
-                <Select value={f.classification} onValueChange={(v) => dispatch(setField({ key: 'classification', value: v }))}>
-                  <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
-                  <SelectContent><SelectItem value="critical">Critical</SelectItem><SelectItem value="major">Major</SelectItem><SelectItem value="minor">Minor</SelectItem></SelectContent>
-                </Select></F>
-              <F label="Qty Affected" flash={chat.flashKeys.includes('quantity_affected')}>
-                <Input value={f.quantity_affected} onChange={(e) => dispatch(setField({ key: 'quantity_affected', value: e.target.value }))} /></F>
-              <F label="Date Received" flash={chat.flashKeys.includes('date_received')}>
-                <Input type="date" value={f.date_received} onChange={(e) => dispatch(setField({ key: 'date_received', value: e.target.value }))} /></F>
-              <F label="Source" flash={chat.flashKeys.includes('source_channel')}>
+              <F label="Complaint Source" flash={chat.flashKeys.includes('source_channel')}>
                 <Select value={f.source_channel} onValueChange={(v) => dispatch(setField({ key: 'source_channel', value: v }))}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder="Awaiting AI extraction..." /></SelectTrigger>
                   <SelectContent>{['email','phone','portal','letter','verbal','other'].map((s) => <SelectItem key={s} value={s} className="capitalize">{s}</SelectItem>)}</SelectContent>
                 </Select></F>
+              <F label="Customer Name" flash={chat.flashKeys.includes('complainant_name')}>
+                <Input value={f.complainant_name} onChange={(e) => dispatch(setField({ key: 'complainant_name', value: e.target.value }))} placeholder="Awaiting AI extraction..." /></F>
+              <F label="Customer Organization" flash={chat.flashKeys.includes('complainant_org')}>
+                <Input value={f.complainant_org} onChange={(e) => dispatch(setField({ key: 'complainant_org', value: e.target.value }))} placeholder="Awaiting AI extraction..." /></F>
+              <F label="Email" flash={chat.flashKeys.includes('email')}>
+                <Input value={f.email} onChange={(e) => dispatch(setField({ key: 'email', value: e.target.value }))} placeholder="Awaiting AI extraction..." /></F>
+              <F label="Country" flash={chat.flashKeys.includes('country')}>
+                <Input value={f.country} onChange={(e) => dispatch(setField({ key: 'country', value: e.target.value }))} placeholder="Awaiting AI extraction..." /></F>
+            </div>
+
+            <Separator className="my-5" />
+
+            {/* ── Section 2: Product & Batch Identification ── */}
+            <p className="mb-3 text-[10px] font-bold uppercase tracking-[.16em] text-ink/40">2. Product &amp; Batch Identification</p>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <F label="Product Name" flash={chat.flashKeys.includes('product_name')}>
+                <Input value={f.product_name} onChange={(e) => dispatch(setField({ key: 'product_name', value: e.target.value }))} placeholder="Awaiting AI extraction..." /></F>
+              <F label="Product Strength / Grade" flash={chat.flashKeys.includes('product_strength')}>
+                <Input value={f.product_strength || f.grade} onChange={(e) => dispatch(setField({ key: 'product_strength', value: e.target.value }))} placeholder="Awaiting AI extraction..." /></F>
+              <F label="Batch / Lot Number" flash={chat.flashKeys.includes('batch_number')}>
+                <Input value={f.batch_number} onChange={(e) => dispatch(setField({ key: 'batch_number', value: e.target.value }))} className="font-mono" placeholder="Awaiting AI extraction..." /></F>
+              <F label="Manufacturing Date" flash={chat.flashKeys.includes('manufacturing_date')}>
+                <Input type="date" value={f.manufacturing_date} onChange={(e) => dispatch(setField({ key: 'manufacturing_date', value: e.target.value }))} placeholder="Awaiting AI extraction..." /></F>
+              <F label="Expiry Date" flash={chat.flashKeys.includes('expiry_date')}>
+                <Input type="date" value={f.expiry_date} onChange={(e) => dispatch(setField({ key: 'expiry_date', value: e.target.value }))} placeholder="Awaiting AI extraction..." /></F>
+              <F label="Quantity Affected" flash={chat.flashKeys.includes('quantity_affected')}>
+                <Input value={f.quantity_affected} onChange={(e) => dispatch(setField({ key: 'quantity_affected', value: e.target.value }))} placeholder="Awaiting AI extraction..." /></F>
+              <F label="Dosage Form" flash={chat.flashKeys.includes('dosage_form')}>
+                <Input value={f.dosage_form} onChange={(e) => dispatch(setField({ key: 'dosage_form', value: e.target.value }))} placeholder="Awaiting AI extraction..." /></F>
+              <F label="Product Code" flash={chat.flashKeys.includes('product_code')}>
+                <Input value={f.product_code} onChange={(e) => dispatch(setField({ key: 'product_code', value: e.target.value }))} className="font-mono" placeholder="Awaiting AI extraction..." /></F>
+            </div>
+
+            <Separator className="my-5" />
+
+            {/* ── Section 3: Complaint Details ── */}
+            <p className="mb-3 text-[10px] font-bold uppercase tracking-[.16em] text-ink/40">3. Complaint Details</p>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <F label="Complaint Type" flash={chat.flashKeys.includes('complaint_type')}>
+                <Select value={f.complaint_type} onValueChange={(v) => dispatch(setField({ key: 'complaint_type', value: v }))}>
+                  <SelectTrigger><SelectValue placeholder="Awaiting AI extraction..." /></SelectTrigger>
+                  <SelectContent>{TYPES.map((t) => <SelectItem key={t} value={t} className="capitalize">{t.replace(/_/g, ' ')}</SelectItem>)}</SelectContent>
+                </Select></F>
+              <F label="Complaint Date" flash={chat.flashKeys.includes('date_received')}>
+                <Input type="date" value={f.date_received} onChange={(e) => dispatch(setField({ key: 'date_received', value: e.target.value }))} placeholder="Awaiting AI extraction..." /></F>
               <div className="sm:col-span-2">
-                <F label="Description" flash={chat.flashKeys.includes('description')}>
-                  <Textarea rows={3} value={f.description} onChange={(e) => dispatch(setField({ key: 'description', value: e.target.value }))} /></F>
+                <F label="Detailed Complaint Description" flash={chat.flashKeys.includes('description')}>
+                  <Textarea rows={3} value={f.description} onChange={(e) => dispatch(setField({ key: 'description', value: e.target.value }))} placeholder="Awaiting AI extraction..." /></F>
               </div>
               <label className="flex cursor-pointer items-center gap-2.5 rounded-lg border border-ink/10 bg-bone px-3 py-2 sm:col-span-2">
                 <input type="checkbox" checked={f.adverse_event} className="h-4 w-4 accent-red-600"
@@ -116,11 +129,32 @@ export default function NewComplaint() {
                 <span className="text-xs font-semibold">Adverse event / patient safety involved</span>
               </label>
             </div>
-            <Separator className="my-4" />
-            <div className="flex justify-end gap-2">
-              <Button variant="ghost" onClick={() => dispatch(resetChat())}>Clear All</Button>
-              <Button variant="glow" size="lg" onClick={submit} disabled={loading || !hasData}>
-                <Send className="h-4 w-4" /> Submit Complaint
+
+            <Separator className="my-5" />
+
+            {/* ── Section 4: Initial Assessment & Priority ── */}
+            <p className="mb-3 text-[10px] font-bold uppercase tracking-[.16em] text-ink/40">4. Initial Assessment &amp; Priority</p>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <F label="Initial Severity" flash={chat.flashKeys.includes('classification')}>
+                <Select value={f.classification} onValueChange={(v) => dispatch(setField({ key: 'classification', value: v }))}>
+                  <SelectTrigger><SelectValue placeholder="Awaiting AI extraction..." /></SelectTrigger>
+                  <SelectContent><SelectItem value="critical">Critical</SelectItem><SelectItem value="major">Major</SelectItem><SelectItem value="minor">Minor</SelectItem></SelectContent>
+                </Select></F>
+              <F label="Priority" flash={chat.flashKeys.includes('classification')}>
+                <Select value={risk ? risk.risk_level : ''} disabled>
+                  <SelectTrigger><SelectValue placeholder="Awaiting AI extraction..." /></SelectTrigger>
+                  <SelectContent><SelectItem value="critical">Critical</SelectItem><SelectItem value="high">High</SelectItem><SelectItem value="medium">Medium</SelectItem><SelectItem value="low">Low</SelectItem></SelectContent>
+                </Select></F>
+            </div>
+
+            <Separator className="my-5" />
+            <div className="flex items-center justify-between">
+              <Button variant="outline" onClick={() => dispatch(resetChat())} className="gap-1.5">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                Reset Form
+              </Button>
+              <Button variant="glow" size="lg" onClick={submit} disabled={loading || !hasData} className="gap-1.5">
+                <Send className="h-4 w-4" /> Save Complaint
               </Button>
             </div>
           </CardContent>
