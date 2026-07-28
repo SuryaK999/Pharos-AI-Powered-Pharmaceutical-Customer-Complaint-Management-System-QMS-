@@ -69,8 +69,12 @@ export default function ChatPanel() {
           
           {messages.length === 0 && (
             <div className="flex h-full flex-col items-center justify-center pt-8 text-center">
-              <div className="mb-5 grid h-14 w-14 place-items-center rounded-full bg-brand/5">
-                <Sparkles className="h-7 w-7 text-brand" />
+              <div className="mb-8 relative flex h-16 w-16 items-center justify-center">
+                <div className="absolute inset-0 animate-ping rounded-full bg-brand/20 [animation-duration:3s]" />
+                <div className="absolute inset-1 animate-pulse rounded-full bg-brand/30 [animation-duration:2s]" />
+                <div className="relative z-10 grid h-12 w-12 place-items-center rounded-full bg-gradient-to-br from-brand to-emerald-600 shadow-[0_0_20px_rgba(23,160,140,0.4)]">
+                  <Sparkles className="h-6 w-6 text-white" />
+                </div>
               </div>
               <h3 className="mb-2 text-[22px] font-semibold tracking-tight text-ink">How can I help you today?</h3>
               <p className="mb-10 max-w-sm text-[13px] leading-relaxed text-ink/50">
