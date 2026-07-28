@@ -157,7 +157,7 @@ The following traces the explicit path a complaint takes through the system arch
 - **State Management**: Redux Toolkit 2.5 (`complaints` and `intake` slices)
 - **Routing**: React Router DOM v7
 - **Styling**: Vanilla Tailwind CSS 3.4 + Radix UI Primitives + Lucide Icons + Sonner Toasts
-- **Typography**: Google Fonts (*Inter*, *Space Grotesk*, *JetBrains Mono*)
+- **Typography**: Google Fonts (*Inter* — globally enforced as the sole typeface across all UI elements)
 
 ---
 
