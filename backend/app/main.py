@@ -14,3 +14,4 @@ app.include_router(router, prefix="/api")
 @app.get("/api/health")
 def health():
     return {"status": "ok", "engine": "groq", "models": [settings.model_primary, settings.model_context]}
+
