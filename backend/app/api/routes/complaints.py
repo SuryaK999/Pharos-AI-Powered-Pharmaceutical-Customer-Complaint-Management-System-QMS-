@@ -146,6 +146,24 @@ def update_complaint(cid: str, payload: ComplaintUpdate, db: Session = Depends(g
     db.commit(); db.refresh(c)
     return c
 
+@router.post("/complaints/{cid}/analyze", response_model=ComplaintOut)
+def analyze_complaint_endpoint(cid: str, db: Session = Depends(get_db)):
+    from ...ai.analysis import analyze_complaint
+    c = db.query(Complaint).get(cid)
+    if not c: raise HTTPException(404, "Complaint not found")
+    
+    try:
+        result = analyze_complaint(c)
+        c.root_cause = result.get("root_cause")
+        c.capa = result.get("capa")
+        c.summary = result.get("summary")
+        db.add(Activity(complaint_id=c.id, action="edited", details="AI Root Cause, CAPA, and Summary generated."))
+        db.commit()
+        db.refresh(c)
+        return c
+    except Exception as e:
+        raise HTTPException(500, f"AI analysis failed: {str(e)}")
+
 # ── Dashboard ──────────────────────────────────────────
 @router.get("/stats", response_model=StatsOut)
 def stats(db: Session = Depends(get_db)):

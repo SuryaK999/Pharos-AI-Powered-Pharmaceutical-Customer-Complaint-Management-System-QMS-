@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { toast } from 'sonner'
 import { ArrowLeft, CalendarDays, History, MapPin, Package, User } from 'lucide-react'
-import { fetchComplaint, updateComplaint, clearCurrent } from '@/store/complaintsSlice'
+import { fetchComplaint, updateComplaint, analyzeComplaint, clearCurrent } from '@/store/complaintsSlice'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -12,6 +12,7 @@ import { Separator } from '@/components/ui/separator'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { StatusBadge, RiskBadge, TypeBadge } from '@/components/badges'
 import CopilotPanel from '@/components/CopilotPanel'
+import { useState } from 'react'
 
 const WORKFLOW = ['draft', 'submitted', 'under_review', 'investigation', 'capa', 'closed']
 
@@ -27,6 +28,7 @@ export default function ComplaintDetail() {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const { current: c, loading } = useSelector((s) => s.complaints)
+  const [isAnalyzing, setIsAnalyzing] = useState(false)
 
   useEffect(() => { dispatch(fetchComplaint(id)); return () => dispatch(clearCurrent()) }, [dispatch, id])
 
@@ -37,6 +39,14 @@ export default function ComplaintDetail() {
     const res = await dispatch(updateComplaint({ id, status }))
     if (res.meta.requestStatus === 'fulfilled') toast.success(`Status → ${status.replace('_', ' ')}`)
     else toast.error('Update failed')
+  }
+
+  const handleAnalyze = async () => {
+    setIsAnalyzing(true)
+    const res = await dispatch(analyzeComplaint(id))
+    if (res.meta.requestStatus === 'fulfilled') toast.success('AI Analysis complete')
+    else toast.error('AI Analysis failed')
+    setIsAnalyzing(false)
   }
 
   return (
@@ -124,7 +134,8 @@ export default function ComplaintDetail() {
         <div className="reveal" style={{ animationDelay: '160ms' }}>
           <CopilotPanel compact risk={c.risk_level ? { severity: c.risk_severity, probability: c.risk_probability, score: c.risk_score, risk_level: c.risk_level, rationale: c.risk_rationale } : null}
             completeness={c.completeness_score != null ? { score: c.completeness_score, missing_fields: c.missing_fields } : null}
-            duplicates={c.duplicate_candidates} rootCause={c.root_cause} capa={c.capa} summary={null} />
+            duplicates={c.duplicate_candidates} rootCause={c.root_cause} capa={c.capa} summary={c.summary} 
+            onAnalyze={handleAnalyze} isAnalyzing={isAnalyzing} />
         </div>
       </div>
     </div>

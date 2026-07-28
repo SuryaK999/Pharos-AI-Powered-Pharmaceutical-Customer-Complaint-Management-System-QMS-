@@ -1,0 +1,19 @@
+Date of Transcript: 28 July 2026
+Time: 14:35 CET
+Call Reference: #TC-88942
+Agent: Sarah Jenkins (Level 2 Support Desk)
+Customer: Maria Garcia, Inventory Manager (m.garcia@citypharmacy.co.uk)
+Institution: City Pharmacy Retail Chain, London, UK
+
+
+Agent: Thank you for calling Pharos Quality Support. My name is Sarah. How can I assist you today?
+Customer: Hi Sarah, this is Maria Garcia from the City Pharmacy central warehouse in London. We've got a major issue with a shipment we just received this morning.
+Agent: I'm very sorry to hear that, Maria. Could you provide me with the product details and explain what's wrong?
+Customer: Yes, it's for Azithromycin 250 mg Tablets. The product code is AZI-250-TAB. We received batch AZI2605E. The expiry on the boxes says 11/2028.
+Agent: I have that pulled up. What seems to be the problem with the batch?
+Customer: The secondary packaging on almost an entire pallet is severely crushed. It looks like it was mishandled during transit or at your distribution center. We've identified exactly 450 boxes that are completely unsellable due to the crushed cardboard.
+Agent: I see. Are the primary blister packs inside the boxes damaged as well?
+Customer: Yes, we checked a random sample of the crushed boxes. Several of the foil blister packs are punctured or bent so badly that the tablets inside are fractured.
+Agent: That is certainly a critical issue. We will need to initiate a full replacement for those 450 boxes and log this formally with our quality team for investigation. Are the damaged boxes currently separated from your sellable stock?
+Customer: Yes, we have quarantined the entire pallet. None of this batch will be moved to our retail floors until we get this sorted out.
+Agent: Excellent. I am submitting this data to our QMS AI intake system right now. You will receive an email shortly with your complaint reference number and instructions for the return authorization.

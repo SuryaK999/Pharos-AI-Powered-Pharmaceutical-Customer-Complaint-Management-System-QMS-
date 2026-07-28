@@ -62,7 +62,7 @@ export default function NewComplaint() {
             <CardDescription>Populated by the Copilot via chat. Edit here or via prompts.</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-4 sm:grid-cols-2">
               <F label="Complainant Org" flash={chat.flashKeys.includes('complainant_org')}>
                 <Input value={f.complainant_org} onChange={(e) => dispatch(setField({ key: 'complainant_org', value: e.target.value }))} placeholder="Apollo Pharmacy" /></F>
               <F label="Contact Name" flash={chat.flashKeys.includes('complainant_name')}>
@@ -106,11 +106,11 @@ export default function NewComplaint() {
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>{['email','phone','portal','letter','verbal','other'].map((s) => <SelectItem key={s} value={s} className="capitalize">{s}</SelectItem>)}</SelectContent>
                 </Select></F>
-              <div className="sm:col-span-2 lg:col-span-3">
+              <div className="sm:col-span-2">
                 <F label="Description" flash={chat.flashKeys.includes('description')}>
                   <Textarea rows={3} value={f.description} onChange={(e) => dispatch(setField({ key: 'description', value: e.target.value }))} /></F>
               </div>
-              <label className="flex cursor-pointer items-center gap-2.5 rounded-lg border border-ink/10 bg-bone px-3 py-2 sm:col-span-2 lg:col-span-3">
+              <label className="flex cursor-pointer items-center gap-2.5 rounded-lg border border-ink/10 bg-bone px-3 py-2 sm:col-span-2">
                 <input type="checkbox" checked={f.adverse_event} className="h-4 w-4 accent-red-600"
                   onChange={(e) => dispatch(setField({ key: 'adverse_event', value: e.target.checked }))} />
                 <span className="text-xs font-semibold">Adverse event / patient safety involved</span>
@@ -172,7 +172,7 @@ export default function NewComplaint() {
 
       {/* ═══ RIGHT: AI Chat ═══ */}
       <div className="order-first xl:order-none xl:col-span-6">
-        <Card className="reveal sticky top-20 flex h-[calc(100vh-120px)] flex-col overflow-hidden border-0 shadow-none ring-1 ring-ink/[0.05]" style={{ animationDelay: '100ms' }}>
+        <Card className="reveal sticky top-4 flex h-[calc(100vh-40px)] flex-col overflow-hidden border-0 shadow-none ring-1 ring-ink/[0.05]" style={{ animationDelay: '100ms' }}>
           <ChatPanel />
         </Card>
       </div>

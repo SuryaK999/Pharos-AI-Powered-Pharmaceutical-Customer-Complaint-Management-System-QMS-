@@ -14,7 +14,7 @@ const SECTIONS = [
   {
     label: 'Quality Operations',
     items: [
-      { to: '/complaints', label: 'Complaint Register', icon: ClipboardList },
+      { to: '/complaints', label: 'Complaint Register', icon: ClipboardList, end: true },
       { to: '/complaints/new', label: 'Log Complaint', icon: FilePlus2, accent: true },
     ],
   },
@@ -33,14 +33,14 @@ function Logo({ collapsed }) {
         src="/pharos-logo.svg" 
         alt="Pharos Logo" 
         className={cn("object-contain transition-transform duration-300 group-hover:scale-105", 
-          collapsed ? "h-10 w-10" : "h-[52px] w-[52px] shrink-0 drop-shadow-lg")} 
+          collapsed ? "h-12 w-12" : "h-[64px] w-[64px] shrink-0 drop-shadow-lg")} 
       />
       {!collapsed && (
         <span className="min-w-0 flex-1 pt-0.5 transition-all duration-300">
-          <span className="block truncate font-display text-[20px] font-bold tracking-tight text-white leading-none">
+          <span className="block truncate font-display text-[26px] font-bold tracking-tight text-white leading-none">
             Pharos<span className="text-brand-glow">.</span>
           </span>
-          <span className="block mt-1.5 text-[9.5px] font-semibold uppercase tracking-[.26em] text-white/40 leading-none">
+          <span className="block mt-1.5 text-[11px] font-semibold uppercase tracking-[.26em] text-white/40 leading-none">
             QMS · Complaints
           </span>
         </span>

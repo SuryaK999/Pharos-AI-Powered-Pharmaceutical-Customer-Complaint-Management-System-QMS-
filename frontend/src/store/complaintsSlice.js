@@ -12,6 +12,7 @@ export const fetchComplaints = createAsyncThunk('complaints/list', (params = {})
 export const fetchComplaint = createAsyncThunk('complaints/one', (id) => api.get(`/complaints/${id}`))
 export const createComplaint = createAsyncThunk('complaints/create', (payload) => api.post('/complaints', payload))
 export const updateComplaint = createAsyncThunk('complaints/update', ({ id, ...body }) => api.patch(`/complaints/${id}`, body))
+export const analyzeComplaint = createAsyncThunk('complaints/analyze', (id) => api.post(`/complaints/${id}/analyze`))
 
 const slice = createSlice({
   name: 'complaints',
@@ -23,6 +24,7 @@ const slice = createSlice({
     b.addCase(fetchComplaint.fulfilled, (s, a) => { s.current = a.payload; s.loading = false })
     b.addCase(createComplaint.fulfilled, (s, a) => { s.current = a.payload; s.loading = false })
     b.addCase(updateComplaint.fulfilled, (s, a) => { s.current = a.payload; s.loading = false })
+    b.addCase(analyzeComplaint.fulfilled, (s, a) => { s.current = a.payload; s.loading = false })
     b.addMatcher((a) => a.type.endsWith('/pending'), (s) => { s.loading = true; s.error = null })
     b.addMatcher((a) => a.type.endsWith('/rejected'), (s, a) => { s.loading = false; s.error = a.error.message })
   },
