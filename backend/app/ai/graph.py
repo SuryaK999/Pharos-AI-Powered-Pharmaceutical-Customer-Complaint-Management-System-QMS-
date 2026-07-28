@@ -1,8 +1,9 @@
-"""LangGraph intake pipeline.
+"""LangGraph conversational complaint assistant.
 
-  START -> extract -> [ agent_risk | agent_completeness | agent_duplicates ]
-        -> agent_root_cause -> agent_capa -> summarize -> END
+  START -> classify_intent -> [agent_log | agent_edit | agent_extract | agent_respond]
+                           -> agent_risk -> agent_respond -> END
 """
+import json as _json
 import re
 from typing import TypedDict
 from langgraph.graph import StateGraph, START, END
@@ -13,22 +14,16 @@ from ..core.database import SessionLocal
 from ..models.complaint import Complaint
 
 
-class IntakeState(TypedDict, total=False):
-    raw_text: str
-    source: str
-    extracted: dict
+class ChatState(TypedDict, total=False):
+    message: str
+    history: list
+    form_state: dict
+    document_text: str
+    intent: str
+    extracted_fields: dict
     risk: dict
-    completeness: dict
-    duplicates: list
-    root_cause: dict
-    capa: dict
-    summary: str
-
-
-REQUIRED_FIELDS = [
-    "complainant_org", "product_name", "batch_number", "description",
-    "complaint_type", "date_received", "country", "quantity_affected",
-]
+    reply: str
+    action: str
 
 
 def _tok(text: str):
@@ -38,36 +33,10 @@ def _tok(text: str):
     )
 
 
-# ── nodes ──────────────────────────────────────────────
-def node_extract(state: IntakeState):
-    data = complete(prompts.EXTRACTION_SYSTEM, prompts.user_for("extract", state))
-    return {"extracted": data}
-
-
-def node_risk(state: IntakeState):
-    data = complete(prompts.RISK_SYSTEM, prompts.user_for("risk", state))
-    try:
-        s, p = int(data.get("severity") or 3), int(data.get("probability") or 3)
-        score = s * p
-        level = "low" if score <= 4 else "medium" if score <= 9 else "high" if score <= 14 else "critical"
-        data.update(severity=s, probability=p, score=score, risk_level=level)
-    except Exception:
-        pass
-    return {"risk": data}
-
-
-def node_completeness(state: IntakeState):
-    ext = state.get("extracted") or {}
-    missing = [f for f in REQUIRED_FIELDS if not ext.get(f)]
-    score = round(100 * (len(REQUIRED_FIELDS) - len(missing)) / len(REQUIRED_FIELDS), 1)
-    return {"completeness": {"score": score, "missing_fields": missing, "checked_fields": REQUIRED_FIELDS}}
-
-
-def node_duplicates(state: IntakeState):
-    ext = state.get("extracted") or {}
-    prod = (ext.get("product_name") or "").lower()
-    batch = re.sub(r"[^a-z0-9]", "", (ext.get("batch_number") or "").lower())
-    desc_toks = _tok(ext.get("description"))
+def _find_duplicates(form: dict) -> list:
+    prod = (form.get("product_name") or "").lower()
+    batch = re.sub(r"[^a-z0-9]", "", (form.get("batch_number") or "").lower())
+    desc_toks = _tok(form.get("description"))
     out = []
     db = SessionLocal()
     try:
@@ -84,61 +53,142 @@ def node_duplicates(state: IntakeState):
             if union:
                 s += 0.30 * len(inter) / len(union)
             if s >= 0.5:
-                out.append({
-                    "id": c.id,
-                    "complaint_number": c.complaint_number,
-                    "product_name": c.product_name,
-                    "batch_number": c.batch_number,
-                    "status": c.status,
-                    "similarity": round(s * 100),
-                })
+                out.append({"id": c.id, "complaint_number": c.complaint_number,
+                            "product_name": c.product_name, "batch_number": c.batch_number,
+                            "status": c.status, "similarity": round(s * 100)})
     finally:
         db.close()
     out.sort(key=lambda x: -x["similarity"])
-    return {"duplicates": out[:3]}
+    return out[:3]
 
 
-def node_root_cause(state: IntakeState):
-    return {"root_cause": complete(
-        prompts.ROOT_CAUSE_SYSTEM, prompts.user_for("rc", state),
-        model=settings.model_context,
-    )}
+# ── nodes ──────────────────────────────────────────────
+def node_classify(state: ChatState):
+    ctx = prompts.history_text(state.get("history") or [])
+    has_doc = bool(state.get("document_text"))
+    user_msg = f"Conversation so far:\n{ctx}\n\nUser message: {state.get('message', '')}"
+    if has_doc:
+        user_msg += "\n\n(A document was uploaded with this message)"
+    data = complete(prompts.INTENT_SYSTEM, user_msg, temperature=0.0, max_tokens=60)
+    intent = data.get("intent", "general")
+    if has_doc and intent == "general":
+        intent = "extract"
+    return {"intent": intent}
 
 
-def node_capa(state: IntakeState):
-    return {"capa": complete(
-        prompts.CAPA_SYSTEM, prompts.user_for("capa", state),
-        model=settings.model_context,
-    )}
+def node_log(state: ChatState):
+    ctx = prompts.history_text(state.get("history") or [])
+    user = f"Conversation:\n{ctx}\n\nUser complaint: {state.get('message', '')}"
+    data = complete(prompts.LOG_SYSTEM, user)
+    return {"extracted_fields": data, "action": "log"}
 
 
-def node_summarize(state: IntakeState):
-    data = complete(prompts.SUMMARY_SYSTEM, prompts.user_for("sum", state))
-    return {"summary": data.get("summary") or data.get("error") or ""}
+def node_edit(state: ChatState):
+    form_json = _json.dumps(state.get("form_state") or {}, indent=1, default=str)
+    system = prompts.EDIT_SYSTEM.replace("{form_json}", form_json)
+    ctx = prompts.history_text(state.get("history") or [])
+    user = f"Conversation:\n{ctx}\n\nUser edit request: {state.get('message', '')}"
+    data = complete(system, user)
+    updates = data.get("updates") or {}
+    reply = data.get("reply") or f"Updated {len(updates)} field(s)."
+    return {"extracted_fields": updates, "reply": reply, "action": "edit"}
 
 
-# ── graph ──────────────────────────────────────────────
-def build_graph():
-    g = StateGraph(IntakeState)
-    g.add_node("extract", node_extract)
+def node_extract(state: ChatState):
+    doc = state.get("document_text") or ""
+    msg = state.get("message") or "Extract complaint details from this document."
+    user = f"User instruction: {msg}\n\nDOCUMENT CONTENT:\n{doc[:6000]}"
+    data = complete(prompts.LOG_SYSTEM, user)
+    return {"extracted_fields": data, "action": "extract"}
+
+
+def node_risk(state: ChatState):
+    form = dict(state.get("form_state") or {})
+    updates = state.get("extracted_fields") or {}
+    form.update({k: v for k, v in updates.items() if v is not None})
+    form_json = _json.dumps(form, indent=1, default=str)
+    data = complete(prompts.RISK_SYSTEM, f"Complaint form data:\n{form_json}")
+    try:
+        s, p = int(data.get("severity") or 3), int(data.get("probability") or 3)
+        score = s * p
+        level = "low" if score <= 4 else "medium" if score <= 9 else "high" if score <= 14 else "critical"
+        data.update(severity=s, probability=p, score=score, risk_level=level)
+    except Exception:
+        pass
+    data["duplicates"] = _find_duplicates(form)
+    return {"risk": data}
+
+
+def node_respond(state: ChatState):
+    intent = state.get("intent", "general")
+    action = state.get("action", intent)
+
+    if intent == "general" and not state.get("extracted_fields"):
+        ctx = prompts.history_text(state.get("history") or [])
+        data = complete(prompts.RESPOND_SYSTEM,
+                        f"Conversation:\n{ctx}\n\nUser: {state.get('message', '')}",
+                        max_tokens=300)
+        reply = data.get("reply") or data.get("response") or str(data)
+        return {"reply": reply, "action": "general"}
+
+    fields = state.get("extracted_fields") or {}
+    risk = state.get("risk") or {}
+
+    if action == "log":
+        filled = [k for k, v in fields.items() if v is not None and v != "" and k != "reply"]
+        reply = (
+            f"I've logged this complaint and extracted {len(filled)} fields into the form. "
+            f"Risk: {(risk.get('risk_level') or 'n/a').upper()} "
+            f"(S{risk.get('severity', '?')} x P{risk.get('probability', '?')} = {risk.get('score', '?')}). "
+            f"{risk.get('rationale', '')} "
+            f"You can edit any field, e.g. \"change batch number to BMX24602\"."
+        )
+    elif action == "edit":
+        reply = state.get("reply") or f"Updated {len(fields)} field(s)."
+        if risk.get("risk_level"):
+            reply += f" Risk re-assessed: {risk['risk_level'].upper()} (score {risk.get('score', '?')})."
+    elif action == "extract":
+        filled = [k for k, v in fields.items() if v is not None and v != "" and k != "reply"]
+        reply = (
+            f"Extracted {len(filled)} fields from the document. "
+            f"Risk: {(risk.get('risk_level') or 'n/a').upper()}. "
+            f"Refine any field by typing, e.g. \"the affected quantity is 48 capsules\"."
+        )
+    else:
+        reply = state.get("reply") or "Done."
+
+    return {"reply": reply, "action": action}
+
+
+# ── routing ────────────────────────────────────────────
+def route_by_intent(state: ChatState) -> str:
+    intent = state.get("intent", "general")
+    return {"log": "agent_log", "edit": "agent_edit", "extract": "agent_extract"}.get(intent, "agent_respond")
+
+
+# ── build ──────────────────────────────────────────────
+def build_chat_graph():
+    g = StateGraph(ChatState)
+    g.add_node("classify_intent", node_classify)
+    g.add_node("agent_log", node_log)
+    g.add_node("agent_edit", node_edit)
+    g.add_node("agent_extract", node_extract)
     g.add_node("agent_risk", node_risk)
-    g.add_node("agent_completeness", node_completeness)
-    g.add_node("agent_duplicates", node_duplicates)
-    g.add_node("agent_root_cause", node_root_cause)
-    g.add_node("agent_capa", node_capa)
-    g.add_node("summarize", node_summarize)
+    g.add_node("agent_respond", node_respond)
 
-    g.add_edge(START, "extract")
-    g.add_edge("extract", "agent_risk")
-    g.add_edge("extract", "agent_completeness")
-    g.add_edge("extract", "agent_duplicates")
-    g.add_edge("agent_risk", "agent_root_cause")
-    g.add_edge("agent_completeness", "agent_root_cause")
-    g.add_edge("agent_duplicates", "agent_root_cause")
-    g.add_edge("agent_root_cause", "agent_capa")
-    g.add_edge("agent_capa", "summarize")
-    g.add_edge("summarize", END)
+    g.add_edge(START, "classify_intent")
+    g.add_conditional_edges("classify_intent", route_by_intent, {
+        "agent_log": "agent_log",
+        "agent_edit": "agent_edit",
+        "agent_extract": "agent_extract",
+        "agent_respond": "agent_respond",
+    })
+    g.add_edge("agent_log", "agent_risk")
+    g.add_edge("agent_edit", "agent_risk")
+    g.add_edge("agent_extract", "agent_risk")
+    g.add_edge("agent_risk", "agent_respond")
+    g.add_edge("agent_respond", END)
     return g.compile()
 
 
-GRAPH = build_graph()
+CHAT_GRAPH = build_chat_graph()

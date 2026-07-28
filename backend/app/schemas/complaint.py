@@ -11,7 +11,9 @@ class ComplaintOut(BaseModel):
     id: str; complaint_number: str; status: str
     source_channel: Optional[str]; source_filename: Optional[str]; raw_text: Optional[str]
     complainant_name: Optional[str]; complainant_org: Optional[str]; email: Optional[str]; country: Optional[str]
-    product_name: Optional[str]; product_code: Optional[str]; batch_number: Optional[str]; dosage_form: Optional[str]
+    product_name: Optional[str]; product_code: Optional[str]; product_strength: Optional[str]
+    batch_number: Optional[str]; dosage_form: Optional[str]; grade: Optional[str]
+    manufacturing_date: Optional[str]; expiry_date: Optional[str]
     complaint_type: Optional[str]; classification: Optional[str]; adverse_event: bool
     quantity_affected: Optional[str]; date_received: Optional[str]; description: Optional[str]
     risk_severity: Optional[int]; risk_probability: Optional[int]; risk_score: Optional[int]
@@ -38,3 +40,19 @@ class StatsOut(BaseModel):
     avg_completeness: float
     by_status: dict; by_risk: dict
     weekly: list; critical_alerts: list; recent: list
+
+class ChatMessage(BaseModel):
+    role: str
+    content: str
+
+class ChatRequest(BaseModel):
+    message: str
+    history: list[ChatMessage] = []
+    form_state: dict = {}
+
+class ChatResponse(BaseModel):
+    reply: str
+    action: str
+    form_updates: dict = {}
+    risk_assessment: Optional[Any] = None
+    duplicates: list = []

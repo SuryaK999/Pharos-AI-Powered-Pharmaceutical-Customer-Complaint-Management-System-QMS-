@@ -1,4 +1,5 @@
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8000/api'
+export { API as base }
 
 async function handle(res) {
   if (!res.ok) {

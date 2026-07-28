@@ -1,48 +1,70 @@
 import json
 from datetime import datetime, timedelta
-from fastapi import APIRouter, Depends, UploadFile, File, HTTPException
+from fastapi import APIRouter, Depends, UploadFile, File, HTTPException, Form
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from ...core.database import get_db
 from ...models.complaint import Complaint, Activity
-from ...schemas.complaint import ComplaintOut, ComplaintCreate, ComplaintUpdate, ProcessTextIn, StatsOut
-from ...ai.graph import GRAPH
+from ...schemas.complaint import (ComplaintOut, ComplaintCreate, ComplaintUpdate,
+                                  ProcessTextIn, StatsOut, ChatRequest, ChatResponse)
+from ...ai.graph import CHAT_GRAPH
 from ...services.documents import parse_upload
 
 router = APIRouter()
 
-def sse(ev: dict) -> str:
-    return f"data: {json.dumps(ev, default=str)}\n\n"
-
-def run_intake_stream(raw_text: str, source: str):
-    yield sse({"type": "start"})
+# ── Conversational AI Chat ─────────────────────────────
+@router.post("/ai/chat", response_model=ChatResponse)
+def ai_chat(body: ChatRequest):
     try:
-        for chunk in GRAPH.stream({"raw_text": raw_text, "source": source}, stream_mode="updates"):
-            for node, update in chunk.items():
-                yield sse({"type": "node", "node": node, "data": update})
-        yield sse({"type": "done"})
+        result = CHAT_GRAPH.invoke({
+            "message": body.message,
+            "history": [m.model_dump() for m in body.history],
+            "form_state": body.form_state,
+        })
     except Exception as e:
-        yield sse({"type": "error", "message": str(e)})
+        raise HTTPException(500, f"AI processing failed: {str(e)}")
+    fields = result.get("extracted_fields") or {}
+    risk = result.get("risk") or {}
+    return ChatResponse(
+        reply=result.get("reply", "Done."),
+        action=result.get("action", "general"),
+        form_updates={k: v for k, v in fields.items() if v is not None and k != "reply"},
+        risk_assessment=risk if risk else None,
+        duplicates=risk.get("duplicates", []) if risk else [],
+    )
 
-# ---------- AI intake ----------
-@router.post("/ai/process-text")
-def process_text(body: ProcessTextIn):
-    if not body.text.strip():
-        raise HTTPException(422, "Empty complaint text.")
-    return StreamingResponse(run_intake_stream(body.text, "pasted text"),
-                             media_type="text/event-stream")
-
-@router.post("/ai/process-file")
-async def process_file(file: UploadFile = File(...)):
+@router.post("/ai/chat-upload", response_model=ChatResponse)
+async def ai_chat_upload(
+    file: UploadFile = File(...),
+    message: str = Form(""),
+    history: str = Form("[]"),
+    form_state: str = Form("{}"),
+):
     try:
         text = parse_upload(file.filename, await file.read())
     except ValueError as e:
         raise HTTPException(422, str(e))
-    return StreamingResponse(run_intake_stream(text, file.filename),
-                             media_type="text/event-stream")
+    try:
+        result = CHAT_GRAPH.invoke({
+            "message": message or f"Extract complaint details from: {file.filename}",
+            "history": json.loads(history),
+            "form_state": json.loads(form_state),
+            "document_text": text,
+        })
+    except Exception as e:
+        raise HTTPException(500, f"AI processing failed: {str(e)}")
+    fields = result.get("extracted_fields") or {}
+    risk = result.get("risk") or {}
+    return ChatResponse(
+        reply=result.get("reply", "Document processed."),
+        action=result.get("action", "extract"),
+        form_updates={k: v for k, v in fields.items() if v is not None and k != "reply"},
+        risk_assessment=risk if risk else None,
+        duplicates=risk.get("duplicates", []) if risk else [],
+    )
 
-# ---------- complaints CRUD ----------
+# ── Complaints CRUD ────────────────────────────────────
 @router.get("/complaints", response_model=list[ComplaintOut])
 def list_complaints(q: str = "", status: str = "", risk: str = "", db: Session = Depends(get_db)):
     query = db.query(Complaint)
@@ -70,18 +92,22 @@ def create_complaint(payload: ComplaintCreate, db: Session = Depends(get_db)):
     c = Complaint(
         complaint_number=f"CC-{datetime.utcnow().year}-{seq:04d}",
         status="submitted",
-        source_channel=f.get("source_channel") or "email",
+        source_channel=f.get("source_channel") or "verbal",
         source_filename=ai.get("source_filename"),
         raw_text=ai.get("raw_text"),
         complainant_name=f.get("complainant_name"), complainant_org=f.get("complainant_org"),
         email=f.get("email"), country=f.get("country"),
         product_name=f.get("product_name"), product_code=f.get("product_code"),
+        product_strength=f.get("product_strength"),
         batch_number=f.get("batch_number"), dosage_form=f.get("dosage_form"),
+        grade=f.get("grade"),
+        manufacturing_date=f.get("manufacturing_date"),
+        expiry_date=f.get("expiry_date"),
         complaint_type=f.get("complaint_type"), classification=f.get("classification"),
         adverse_event=bool(f.get("adverse_event")), quantity_affected=f.get("quantity_affected"),
         date_received=f.get("date_received"), description=f.get("description"),
     )
-    r = ai.get("risk") or {}
+    r = ai.get("risk") or ai.get("risk_assessment") or {}
     if not r.get("error"):
         c.risk_severity, c.risk_probability = r.get("severity"), r.get("probability")
         c.risk_score, c.risk_level, c.risk_rationale = r.get("score"), r.get("risk_level"), r.get("rationale")
@@ -89,13 +115,13 @@ def create_complaint(payload: ComplaintCreate, db: Session = Depends(get_db)):
     c.completeness_score, c.missing_fields = comp.get("score"), comp.get("missing_fields") or []
     dups = ai.get("duplicates") or []
     c.duplicate_candidates = dups
-    if dups and dups[0]["similarity"] >= 70:
+    if dups and dups[0].get("similarity", 0) >= 70:
         c.is_duplicate, c.duplicate_of = True, dups[0]["id"]
-    c.root_cause, c.capa, c.summary = ai.get("root_cause"), ai.get("capa"), ai.get("summary")
+    c.capa, c.summary = ai.get("capa"), ai.get("summary")
     db.add(c)
     db.flush()
     db.add(Activity(complaint_id=c.id, action="logged",
-                    details=f"Complaint logged via AI intake ({c.source_channel}). Risk: {(c.risk_level or 'n/a').upper()}."))
+                    details=f"Complaint logged via AI Copilot ({c.source_channel}). Risk: {(c.risk_level or 'n/a').upper()}."))
     if c.adverse_event:
         db.add(Activity(complaint_id=c.id, action="pv_flag",
                         details="Adverse event flagged — pharmacovigilance notification queued."))
@@ -116,11 +142,11 @@ def update_complaint(cid: str, payload: ComplaintUpdate, db: Session = Depends(g
     if payload.fields:
         for k, v in payload.fields.items():
             if hasattr(c, k): setattr(c, k, v)
-        db.add(Activity(complaint_id=c.id, action="edited", details="Record fields updated after review."))
+        db.add(Activity(complaint_id=c.id, action="edited", details="Record fields updated."))
     db.commit(); db.refresh(c)
     return c
 
-# ---------- dashboard ----------
+# ── Dashboard ──────────────────────────────────────────
 @router.get("/stats", response_model=StatsOut)
 def stats(db: Session = Depends(get_db)):
     now = datetime.utcnow()
