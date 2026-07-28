@@ -124,13 +124,13 @@ Pharos is designed from the ground up to comply with global pharmaceutical quali
 
 ### LangGraph Agent Execution Flow
 
-1. **`extract`** *(Groq · `llama-3.1-8b-instant`)*: Parses unstructured text/email into structured JSON entity fields.
-2. **`risk`** *(Groq · `llama-3.1-8b-instant`)*: Evaluates ICH Q9 risk matrix (Severity 1–5, Probability 1–5, Score 1–25, Level).
+1. **`extract`** *(Groq · `gemma2-9b-it`)*: Parses unstructured text/email into structured JSON entity fields.
+2. **`risk`** *(Groq · `gemma2-9b-it`)*: Evaluates ICH Q9 risk matrix (Severity 1–5, Probability 1–5, Score 1–25, Level).
 3. **`completeness`** *(Deterministic Audit)*: Verifies presence of mandatory QMS fields and calculates percentage score.
 4. **`duplicates`** *(Deterministic Search)*: Scans recent complaint database (Batch match 45%, Product match 25%, Narrative Jaccard 30%).
 5. **`root_cause`** *(Groq · `llama-3.3-70b-versatile`)*: Performs Ishikawa categorization and builds a 5-step "Whys" investigative chain.
 6. **`capa`** *(Groq · `llama-3.3-70b-versatile`)*: Formulates Immediate, Corrective, and Preventive actions alongside regulatory submission guidelines.
-7. **`summarize`** *(Groq · `llama-3.1-8b-instant`)*: Generates an executive brief for QA leadership.
+7. **`summarize`** *(Groq · `gemma2-9b-it`)*: Generates an executive brief for QA leadership.
 
 ### End-to-End Technical Workflow
 
@@ -148,7 +148,7 @@ The following traces the explicit path a complaint takes through the system arch
 ### **Backend**
 - **Framework**: FastAPI 0.115 (Clean Architecture, RESTful patterns)
 - **Orchestration**: LangGraph 0.2.60
-- **LLM Engine**: Groq Client (`llama-3.1-8b-instant` & `llama-3.3-70b-versatile`)
+- **LLM Engine**: Groq Client (`gemma2-9b-it` & `llama-3.3-70b-versatile`)
 - **Database & ORM**: PostgreSQL 16 + SQLAlchemy 2.0 (with SQLite fallback support)
 - **Document Parsers**: PyPDF (`pypdf` 5.1), Python Standard Library `email`
 
@@ -209,7 +209,7 @@ Edit `.env` to include your Groq API Key:
 ```env
 GROQ_API_KEY=gsk_your_groq_token_here
 DATABASE_URL=postgresql://owner:surya@localhost:5432/pharos_qms
-MODEL_PRIMARY=llama-3.1-8b-instant
+MODEL_PRIMARY=gemma2-9b-it
 MODEL_CONTEXT=llama-3.3-70b-versatile
 ```
 
@@ -254,7 +254,7 @@ Pharos employs a dual-model hybrid architecture on Groq's high-speed LPU infrast
                    ┌─────────────────────┴─────────────────────┐
                    ▼                                           ▼
        Fast Extraction & Risk                      Deep Reasoning & CAPA
-       (llama-3.1-8b-instant)                    (llama-3.3-70b-versatile)
+       (gemma2-9b-it)                    (llama-3.3-70b-versatile)
  ─────────┬──────────────────────────── ───────────┬───────────────────────────
           ├─ Parse entities                        ├─ Ishikawa Category & 5 Whys
           ├─ ICH Q9 Risk Matrix                    ├─ Corrective & Preventive Actions
