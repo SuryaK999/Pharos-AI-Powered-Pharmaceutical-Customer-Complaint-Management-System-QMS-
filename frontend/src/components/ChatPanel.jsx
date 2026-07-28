@@ -33,7 +33,7 @@ const Rich = ({ text }) => (
 
 export default function ChatPanel() {
   const dispatch = useDispatch()
-  const { messages, sending } = useSelector((s) => s.chat)
+  const { messages, sending, executingNode } = useSelector((s) => s.chat)
   const [input, setInput] = useState('')
   const [fileName, setFileName] = useState(null)
   const [samples, setSamples] = useState([])
@@ -151,11 +151,27 @@ export default function ChatPanel() {
                 <span className="mr-4 mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-full border border-ink/5 bg-brand/5 text-brand">
                   <Bot className="h-4 w-4" />
                 </span>
-                <div className="flex h-11 items-center gap-1.5 px-2">
-                  <span className="typing-dot" />
-                  <span className="typing-dot" style={{ animationDelay: '0.15s' }} />
-                  <span className="typing-dot" style={{ animationDelay: '0.3s' }} />
-                </div>
+                {executingNode ? (
+                  <div className="flex h-11 flex-col justify-center px-2 w-56">
+                    <div className="flex items-center gap-2 mb-1.5">
+                      <span className="text-[10px] font-bold tracking-wider uppercase text-brand/70">
+                        {executingNode === 'classify_intent' ? 'Classifying Intent...' :
+                         executingNode === 'agent_log' || executingNode === 'agent_extract' ? 'Extracting Complaint Details...' :
+                         executingNode === 'agent_risk' ? 'Assessing Risk & Detecting Duplicates...' :
+                         executingNode === 'agent_respond' ? 'Generating Response...' : 'Processing...'}
+                      </span>
+                    </div>
+                    <div className="h-1.5 w-full overflow-hidden rounded-full bg-brand/15 relative">
+                      <div className="absolute top-0 bottom-0 left-0 bg-brand rounded-full progress-indeterminate" />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex h-11 items-center gap-1.5 px-2">
+                    <span className="typing-dot" />
+                    <span className="typing-dot" style={{ animationDelay: '0.15s' }} />
+                    <span className="typing-dot" style={{ animationDelay: '0.3s' }} />
+                  </div>
+                )}
               </div>
             )}
             <div ref={bottomRef} className="h-4" />

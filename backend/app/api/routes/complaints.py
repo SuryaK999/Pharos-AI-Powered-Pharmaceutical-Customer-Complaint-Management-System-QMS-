@@ -14,27 +14,42 @@ from ...services.documents import parse_upload
 router = APIRouter()
 
 # ── Conversational AI Chat ─────────────────────────────
-@router.post("/ai/chat", response_model=ChatResponse)
-def ai_chat(body: ChatRequest):
-    try:
-        result = CHAT_GRAPH.invoke({
-            "message": body.message,
-            "history": [m.model_dump() for m in body.history],
-            "form_state": body.form_state,
-        })
-    except Exception as e:
-        raise HTTPException(500, f"AI processing failed: {str(e)}")
-    fields = result.get("extracted_fields") or {}
-    risk = result.get("risk") or {}
-    return ChatResponse(
-        reply=result.get("reply", "Done."),
-        action=result.get("action", "general"),
-        form_updates={k: v for k, v in fields.items() if v is not None and k != "reply"},
-        risk_assessment=risk if risk else None,
-        duplicates=risk.get("duplicates", []) if risk else [],
-    )
 
-@router.post("/ai/chat-upload", response_model=ChatResponse)
+def _stream_graph_execution(inputs: dict):
+    state = inputs.copy()
+    try:
+        for chunk in CHAT_GRAPH.stream(inputs):
+            node_name = list(chunk.keys())[0]
+            yield f"data: {json.dumps({'node': node_name})}\n\n"
+            state.update(chunk[node_name])
+            
+        fields = state.get("extracted_fields") or {}
+        risk = state.get("risk") or {}
+        final_result = {
+            "result": {
+                "reply": state.get("reply", "Done."),
+                "action": state.get("action", "general"),
+                "form_updates": {k: v for k, v in fields.items() if v is not None and k != "reply"},
+                "risk_assessment": risk if risk else None,
+                "duplicates": risk.get("duplicates", []) if risk else [],
+            }
+        }
+        yield f"data: {json.dumps(final_result)}\n\n"
+    except Exception as e:
+        yield f"data: {json.dumps({'error': str(e)})}\n\n"
+
+
+@router.post("/ai/chat")
+def ai_chat(body: ChatRequest):
+    inputs = {
+        "message": body.message,
+        "history": [m.model_dump() for m in body.history],
+        "form_state": body.form_state,
+    }
+    return StreamingResponse(_stream_graph_execution(inputs), media_type="text/event-stream")
+
+
+@router.post("/ai/chat-upload")
 async def ai_chat_upload(
     file: UploadFile = File(...),
     message: str = Form(""),
@@ -45,24 +60,13 @@ async def ai_chat_upload(
         text = parse_upload(file.filename, await file.read())
     except ValueError as e:
         raise HTTPException(422, str(e))
-    try:
-        result = CHAT_GRAPH.invoke({
-            "message": message or f"Extract complaint details from: {file.filename}",
-            "history": json.loads(history),
-            "form_state": json.loads(form_state),
-            "document_text": text,
-        })
-    except Exception as e:
-        raise HTTPException(500, f"AI processing failed: {str(e)}")
-    fields = result.get("extracted_fields") or {}
-    risk = result.get("risk") or {}
-    return ChatResponse(
-        reply=result.get("reply", "Document processed."),
-        action=result.get("action", "extract"),
-        form_updates={k: v for k, v in fields.items() if v is not None and k != "reply"},
-        risk_assessment=risk if risk else None,
-        duplicates=risk.get("duplicates", []) if risk else [],
-    )
+    inputs = {
+        "message": message or f"Extract complaint details from: {file.filename}",
+        "history": json.loads(history),
+        "form_state": json.loads(form_state),
+        "document_text": text,
+    }
+    return StreamingResponse(_stream_graph_execution(inputs), media_type="text/event-stream")
 
 # ── Complaints CRUD ────────────────────────────────────
 @router.get("/complaints", response_model=list[ComplaintOut])

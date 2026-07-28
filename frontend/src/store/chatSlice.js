@@ -1,5 +1,5 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import { api, base } from '@/lib/api'
+import { createSlice } from '@reduxjs/toolkit'
+import { streamIntake } from '@/lib/api'
 
 const emptyForm = {
   complainant_name: '', complainant_org: '', email: '', country: '',
@@ -17,24 +17,9 @@ const initialState = {
   duplicates: [],
   flashKeys: [],
   sending: false,
+  executingNode: null,
   error: null,
 }
-
-export const sendChat = createAsyncThunk('chat/send', async ({ message, file }, { getState }) => {
-  const { chat } = getState()
-  const history = chat.messages.map((m) => ({ role: m.role, content: m.content }))
-  if (file) {
-    const fd = new FormData()
-    fd.append('file', file)
-    fd.append('message', message || 'Extract complaint details from this document.')
-    fd.append('history', JSON.stringify(history))
-    fd.append('form_state', JSON.stringify(chat.form))
-    const res = await fetch(`${base}/ai/chat-upload`, { method: 'POST', body: fd })
-    if (!res.ok) { const d = await res.json().catch(() => ({})); throw new Error(d.detail || 'Upload failed') }
-    return res.json()
-  }
-  return api.post('/ai/chat', { message, history, form_state: chat.form })
-})
 
 const slice = createSlice({
   name: 'chat',
@@ -46,15 +31,13 @@ const slice = createSlice({
       s.flashKeys = s.flashKeys.filter((k) => k !== a.payload.key)
     },
     resetChat() { return { ...initialState, form: { ...emptyForm } } },
-  },
-  extraReducers: (b) => {
-    b.addCase(sendChat.pending, (s) => { s.sending = true; s.error = null })
-    b.addCase(sendChat.rejected, (s, a) => {
-      s.sending = false; s.error = a.error.message
-      s.messages.push({ role: 'assistant', content: `⚠️ Error: ${a.error.message}. Check your Groq API key and backend server.`, action: 'error' })
-    })
-    b.addCase(sendChat.fulfilled, (s, a) => {
-      s.sending = false
+    setSending(s, a) { s.sending = a.payload; s.error = null },
+    setExecutingNode(s, a) { s.executingNode = a.payload },
+    handleError(s, a) {
+      s.error = a.payload
+      s.messages.push({ role: 'assistant', content: `⚠️ Error: ${a.payload}. Check your Groq API key and backend server.`, action: 'error' })
+    },
+    handleResult(s, a) {
       const d = a.payload
       s.messages.push({ role: 'assistant', content: d.reply, action: d.action })
       if (d.form_updates && Object.keys(d.form_updates).length) {
@@ -69,9 +52,46 @@ const slice = createSlice({
       }
       if (d.risk_assessment) s.risk = d.risk_assessment
       if (d.duplicates) s.duplicates = d.duplicates
-    })
+    }
   },
 })
 
 export const { addUserMessage, setField, resetChat } = slice.actions
+
+export const sendChat = ({ message, file }) => async (dispatch, getState) => {
+  const { chat } = getState()
+  const history = chat.messages.map((m) => ({ role: m.role, content: m.content }))
+  
+  dispatch(slice.actions.setSending(true))
+  dispatch(slice.actions.setExecutingNode('classify_intent'))
+  
+  try {
+    const onEvent = (data) => {
+      if (data.node) {
+        dispatch(slice.actions.setExecutingNode(data.node))
+      } else if (data.result) {
+        dispatch(slice.actions.handleResult(data.result))
+      } else if (data.error) {
+        throw new Error(data.error)
+      }
+    }
+    
+    if (file) {
+      const fd = new FormData()
+      fd.append('file', file)
+      fd.append('message', message || 'Extract complaint details from this document.')
+      fd.append('history', JSON.stringify(history))
+      fd.append('form_state', JSON.stringify(chat.form))
+      await streamIntake('/ai/chat-upload', { file: fd }, onEvent)
+    } else {
+      await streamIntake('/ai/chat', { json: { message, history, form_state: chat.form } }, onEvent)
+    }
+  } catch (err) {
+    dispatch(slice.actions.handleError(err.message))
+  } finally {
+    dispatch(slice.actions.setSending(false))
+    dispatch(slice.actions.setExecutingNode(null))
+  }
+}
+
 export default slice.reducer
