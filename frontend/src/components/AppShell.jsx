@@ -24,8 +24,8 @@ export default function AppShell({ children }) {
       {/* ── Sidebar ── */}
       <aside className="fixed inset-y-0 left-0 z-40 flex w-[76px] flex-col border-r border-white/5 bg-pine lg:w-60">
         <Link to="/" className="flex items-center gap-3 px-4 py-5 lg:px-5">
-          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-brand to-brand-glow shadow-[0_0_24px_rgba(23,160,140,.4)]">
-            <Activity className="h-5 w-5 text-teal-100" strokeWidth={2.6} />
+          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-slate-900/80 p-1.5 shadow-[0_0_24px_rgba(14,165,233,.4)] ring-1 ring-white/20">
+            <img src="/pharos-logo.svg" alt="Pharos Logo" className="h-7 w-7" />
           </span>
           <span className="hidden lg:block">
             <span className="block font-display text-lg font-bold tracking-tight text-white">PHAROS<span className="text-brand-glow"> ⭐</span></span>
