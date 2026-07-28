@@ -30,10 +30,20 @@ function Logo({ collapsed }) {
   return (
     <Link to="/" className={cn("group flex items-center px-4 py-5", collapsed ? "justify-center px-0" : "gap-3")}>
       <img 
-        src="/logo.png" 
+        src="/pharos-logo.svg" 
         alt="Pharos Logo" 
-        className={cn("object-contain transition-all duration-300", collapsed ? "h-7 w-7" : "h-8")} 
+        className={cn("object-contain transition-transform duration-300 group-hover:scale-105", collapsed ? "h-9 w-9" : "h-11")} 
       />
+      {!collapsed && (
+        <span className="min-w-0 transition-all duration-300">
+          <span className="block truncate font-display text-[17px] font-bold tracking-tight text-white">
+            Pharos<span className="text-brand-glow">.</span>
+          </span>
+          <span className="block text-[9px] font-semibold uppercase tracking-[.28em] text-white/35">
+            QMS · Complaints
+          </span>
+        </span>
+      )}
     </Link>
   )
 }
@@ -45,20 +55,20 @@ function NavItem({ item, collapsed }) {
     <NavLink to={to} end={end}
       className={({ isActive }) => cn(
         'group relative flex items-center gap-3 rounded-lg px-3 py-2 text-[13px] font-medium transition-all duration-200',
-        isActive ? 'bg-brand/10 text-brand-dark' : 'text-ink/60 hover:bg-ink/5 hover:text-ink')}>
+        isActive ? 'bg-white/[0.07] text-white' : 'text-white/45 hover:bg-white/[0.04] hover:text-white/85')}>
       {({ isActive }) => (
         <>
-          <span className={cn('absolute left-0 top-1/2 h-4 w-[2.5px] -translate-y-1/2 rounded-r-full bg-brand transition-all duration-300',
+          <span className={cn('absolute left-0 top-1/2 h-4 w-[2.5px] -translate-y-1/2 rounded-r-full bg-brand-glow transition-all duration-300',
             isActive ? 'opacity-80' : 'opacity-0')} />
           <Icon className={cn('h-[17px] w-[17px] shrink-0 transition-colors duration-200',
-            isActive ? 'text-brand' : 'text-ink/40 group-hover:text-ink/70',
-            accent && !isActive && 'text-ink/40')} strokeWidth={1.9} />
+            isActive ? 'text-brand-glow' : 'text-white/40 group-hover:text-white/70',
+            accent && !isActive && 'text-white/40')} strokeWidth={1.9} />
           <span className={cn('flex-1 truncate transition-all duration-300', collapsed && 'lg:hidden')}>{label}</span>
           {accent && !collapsed && (
-            <Sparkles className="hidden h-3 w-3 text-brand/60 lg:block" />
+            <Sparkles className="hidden h-3 w-3 text-brand-glow/60 lg:block" />
           )}
           {collapsed && (
-            <span className="pointer-events-none absolute left-full top-1/2 z-50 ml-3 hidden -translate-y-1/2 whitespace-nowrap rounded-md border border-ink/10 bg-white px-2.5 py-1.5 text-[11px] font-medium text-ink shadow-xl group-hover:block">
+            <span className="pointer-events-none absolute left-full top-1/2 z-50 ml-3 hidden -translate-y-1/2 whitespace-nowrap rounded-md border border-white/10 bg-[#16211d] px-2.5 py-1.5 text-[11px] font-medium text-white/80 shadow-xl group-hover:block">
               {label}
             </span>
           )}
@@ -80,8 +90,11 @@ export default function AppShell({ children }) {
     <div className="flex min-h-screen">
       {/* ═══ SIDEBAR ═══ */}
       <aside className={cn(
-        'fixed inset-y-0 left-0 z-40 flex flex-col border-r border-ink/10 bg-bone transition-all duration-300 ease-[cubic-bezier(.4,0,.2,1)]',
+        'fixed inset-y-0 left-0 z-40 flex flex-col border-r border-white/[0.06] bg-pine transition-all duration-300 ease-[cubic-bezier(.4,0,.2,1)]',
         collapsed ? 'w-[76px]' : 'w-[76px] lg:w-[264px]')}>
+
+        {/* subtle top glow */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-brand/[0.08] to-transparent" />
 
         {/* collapse toggle — attached to edge */}
         <button onClick={() => setCollapsed((c) => !c)}
@@ -96,7 +109,7 @@ export default function AppShell({ children }) {
         <nav className="relative flex-1 space-y-5 overflow-y-auto px-3 pb-4 pt-2">
           {SECTIONS.map((section) => (
             <div key={section.label}>
-              <p className={cn('mb-1.5 px-3 text-[9px] font-bold uppercase tracking-[.22em] text-ink/40 transition-all duration-300',
+              <p className={cn('mb-1.5 px-3 text-[9px] font-bold uppercase tracking-[.22em] text-white/25 transition-all duration-300',
                 collapsed && 'lg:opacity-0 lg:h-0 lg:mb-0 lg:overflow-hidden')}>
                 {section.label}
               </p>
@@ -111,13 +124,13 @@ export default function AppShell({ children }) {
       {/* ═══ MAIN ═══ */}
       <div className={cn('flex min-h-screen flex-1 flex-col transition-[margin] duration-300 ease-[cubic-bezier(.4,0,.2,1)]',
         collapsed ? 'ml-[76px]' : 'ml-[76px] lg:ml-[264px]')}>
-        <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-ink/[0.07] bg-white/85 px-6 backdrop-blur-md lg:px-8">
+        <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-ink/[0.07] bg-bone/85 px-6 backdrop-blur-md lg:px-8">
           <div>
             <p className="text-[9px] font-bold uppercase tracking-[.22em] text-brand">Pharos Quality Suite</p>
             <h1 className="font-display text-[17px] font-bold leading-tight tracking-tight">{title}</h1>
           </div>
           <div className="flex items-center gap-3">
-            <span className="hidden rounded-full border border-ink/10 bg-bone px-3 py-1 font-mono text-[11px] text-ink/60 sm:block">{today}</span>
+            <span className="hidden rounded-full border border-ink/10 bg-white px-3 py-1 font-mono text-[11px] text-ink/55 sm:block">{today}</span>
             <span className="hidden items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[10px] font-semibold text-emerald-700 md:flex">
               <ShieldCheck className="h-3 w-3" /> ICH Q9 · 21 CFR 211.198
             </span>
