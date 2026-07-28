@@ -1,11 +1,30 @@
+import { useState, useEffect } from 'react'
 import { NavLink, useLocation, Link } from 'react-router-dom'
-import { LayoutDashboard, ClipboardList, FilePlus2, Activity, ShieldCheck } from 'lucide-react'
+import {
+  LayoutDashboard, ClipboardList, FilePlus2, Activity, ShieldCheck,
+  ChevronsLeft, Wrench, BarChart3, Settings, Sparkles,
+} from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-const NAV = [
-  { to: '/', label: 'Quality Dashboard', icon: LayoutDashboard, end: true },
-  { to: '/complaints', label: 'Complaint Register', icon: ClipboardList },
-  { to: '/complaints/new', label: 'Log Complaint', icon: FilePlus2 },
+const SECTIONS = [
+  {
+    label: 'Overview',
+    items: [{ to: '/', label: 'Quality Dashboard', icon: LayoutDashboard, end: true }],
+  },
+  {
+    label: 'Quality Operations',
+    items: [
+      { to: '/complaints', label: 'Complaint Register', icon: ClipboardList },
+      { to: '/complaints/new', label: 'Log Complaint', icon: FilePlus2, accent: true },
+    ],
+  },
+  {
+    label: 'Insights',
+    items: [
+      { label: 'CAPA Tracker', icon: Wrench, soon: true },
+      { label: 'Reports & Analytics', icon: BarChart3, soon: true },
+    ],
+  },
 ]
 
 const TITLES = {
@@ -14,70 +33,166 @@ const TITLES = {
   '/complaints/new': 'Log Customer Complaint',
 }
 
+function Logo({ collapsed }) {
+  return (
+    <Link to="/" className="group flex items-center gap-3 px-3 py-5 lg:px-4">
+      <span className="relative grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-brand to-brand-glow shadow-[0_4px_20px_rgba(23,160,140,.35)] transition-transform duration-300 group-hover:scale-105">
+        <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none">
+          <path d="M3 14h4l2.5-7 4 10 2.5-5H21" stroke="#CCFBF1" strokeWidth="2.2"
+            strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+        <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full border-2 border-pine bg-emerald-400" />
+      </span>
+      <span className={cn('min-w-0 transition-all duration-300', collapsed ? 'lg:opacity-0 lg:w-0' : 'lg:opacity-100')}>
+        <span className="block truncate font-display text-[17px] font-bold tracking-tight text-white">
+          Pharos<span className="text-brand-glow">.</span>
+        </span>
+        <span className="block text-[9px] font-semibold uppercase tracking-[.28em] text-white/35">
+          QMS · Complaints
+        </span>
+      </span>
+    </Link>
+  )
+}
+
+function NavItem({ item, collapsed }) {
+  const { to, label, icon: Icon, end, accent, soon } = item
+
+  if (soon) {
+    return (
+      <div className="group relative flex cursor-not-allowed items-center gap-3 rounded-lg px-3 py-2 text-[13px] font-medium text-white/25">
+        <Icon className="h-[17px] w-[17px] shrink-0" strokeWidth={1.8} />
+        <span className={cn('flex-1 truncate transition-all duration-300', collapsed && 'lg:hidden')}>{label}</span>
+        {!collapsed && <span className="hidden rounded-full border border-white/10 px-1.5 py-px text-[8px] font-bold uppercase tracking-wider text-white/30 lg:inline">Soon</span>}
+        {collapsed && (
+          <span className="pointer-events-none absolute left-full top-1/2 z-50 ml-3 hidden -translate-y-1/2 whitespace-nowrap rounded-md border border-white/10 bg-[#16211d] px-2.5 py-1.5 text-[11px] font-medium text-white/80 shadow-xl group-hover:block">
+            {label} · Soon
+          </span>
+        )}
+      </div>
+    )
+  }
+
+  return (
+    <NavLink to={to} end={end}
+      className={({ isActive }) => cn(
+        'group relative flex items-center gap-3 rounded-lg px-3 py-2 text-[13px] font-medium transition-all duration-200',
+        isActive ? 'bg-white/[0.07] text-white' : 'text-white/45 hover:bg-white/[0.04] hover:text-white/85')}>
+      {({ isActive }) => (
+        <>
+          <span className={cn('absolute left-0 top-1/2 h-4 w-[2.5px] -translate-y-1/2 rounded-r-full bg-brand-glow transition-all duration-300',
+            isActive ? 'opacity-80' : 'opacity-0')} />
+          <Icon className={cn('h-[17px] w-[17px] shrink-0 transition-colors duration-200',
+            isActive ? 'text-brand-glow' : 'text-white/40 group-hover:text-white/70',
+            accent && !isActive && 'text-white/40')} strokeWidth={1.9} />
+          <span className={cn('flex-1 truncate transition-all duration-300', collapsed && 'lg:hidden')}>{label}</span>
+          {accent && !collapsed && (
+            <Sparkles className="hidden h-3 w-3 text-brand-glow/60 lg:block" />
+          )}
+          {collapsed && (
+            <span className="pointer-events-none absolute left-full top-1/2 z-50 ml-3 hidden -translate-y-1/2 whitespace-nowrap rounded-md border border-white/10 bg-[#16211d] px-2.5 py-1.5 text-[11px] font-medium text-white/80 shadow-xl group-hover:block">
+              {label}
+            </span>
+          )}
+        </>
+      )}
+    </NavLink>
+  )
+}
+
 export default function AppShell({ children }) {
   const { pathname } = useLocation()
+  const [collapsed, setCollapsed] = useState(() => localStorage.getItem('pharos-sidebar') === '1')
+  useEffect(() => { localStorage.setItem('pharos-sidebar', collapsed ? '1' : '0') }, [collapsed])
+
   const title = TITLES[pathname] || (pathname.startsWith('/complaints/') ? 'Complaint Record' : 'Pharos QMS')
   const today = new Date().toLocaleDateString('en-GB', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' })
 
   return (
     <div className="flex min-h-screen">
-      {/* ── Sidebar ── */}
-      <aside className="fixed inset-y-0 left-0 z-40 flex w-[76px] flex-col border-r border-white/5 bg-pine lg:w-60">
-        <Link to="/" className="flex items-center gap-3 px-4 py-5 lg:px-5">
-          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-slate-900/80 p-1.5 shadow-[0_0_24px_rgba(14,165,233,.4)] ring-1 ring-white/20">
-            <img src="/pharos-logo.svg" alt="Pharos Logo" className="h-7 w-7" />
-          </span>
-          <span className="hidden lg:block">
-            <span className="block font-display text-lg font-bold tracking-tight text-white">PHAROS<span className="text-brand-glow"> ⭐</span></span>
-            <span className="block text-[10px] font-medium tracking-[.05em] text-white/50">Every complaint is a beacon.</span>
-          </span>
-        </Link>
+      {/* ═══ SIDEBAR ═══ */}
+      <aside className={cn(
+        'fixed inset-y-0 left-0 z-40 flex flex-col border-r border-white/[0.06] bg-pine transition-all duration-300 ease-[cubic-bezier(.4,0,.2,1)]',
+        collapsed ? 'w-[76px]' : 'w-[76px] lg:w-[264px]')}>
 
-        <nav className="mt-4 flex-1 space-y-1 px-3">
-          {NAV.map(({ to, label, icon: Icon, end }) => (
-            <NavLink key={to} to={to} end={end}
-              className={({ isActive }) => cn(
-                'group relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200',
-                isActive ? 'bg-white/10 text-white' : 'text-white/50 hover:bg-white/5 hover:text-white/90')}>
-              {({ isActive }) => (
-                <>
-                  <span className={cn('absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-r-full bg-brand-glow transition-all duration-300', isActive ? 'opacity-100' : 'opacity-0')} />
-                  <Icon className={cn('h-[18px] w-[18px] shrink-0 transition-transform duration-200 group-hover:scale-110', isActive && 'text-brand-glow')} />
-                  <span className="hidden lg:inline">{label}</span>
-                </>
-              )}
-            </NavLink>
+        {/* subtle top glow */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-brand/[0.08] to-transparent" />
+
+        {/* collapse toggle — attached to edge */}
+        <button onClick={() => setCollapsed((c) => !c)}
+          className="absolute -right-3 top-[70px] z-50 hidden h-6 w-6 place-items-center rounded-full border border-ink/15 bg-white shadow-md transition-all duration-200 hover:scale-110 hover:border-brand/40 lg:grid"
+          title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}>
+          <ChevronsLeft className={cn('h-3.5 w-3.5 text-ink/60 transition-transform duration-300', collapsed && 'rotate-180')} />
+        </button>
+
+        <Logo collapsed={collapsed} />
+
+        {/* nav */}
+        <nav className="relative flex-1 space-y-5 overflow-y-auto px-3 pb-4 pt-2">
+          {SECTIONS.map((section) => (
+            <div key={section.label}>
+              <p className={cn('mb-1.5 px-3 text-[9px] font-bold uppercase tracking-[.22em] text-white/25 transition-all duration-300',
+                collapsed && 'lg:opacity-0 lg:h-0 lg:mb-0 lg:overflow-hidden')}>
+                {section.label}
+              </p>
+              <div className="space-y-0.5">
+                {section.items.map((item) => <NavItem key={item.label || item.to} item={item} collapsed={collapsed} />)}
+              </div>
+            </div>
           ))}
         </nav>
 
-        <div className="hidden px-4 pb-5 lg:block">
-          <div className="rounded-xl border border-white/10 bg-white/5 p-3">
+        {/* engine status */}
+        <div className={cn('px-3 pb-3 transition-all duration-300', collapsed && 'lg:px-2')}>
+          <div className={cn('rounded-xl border border-white/[0.07] bg-white/[0.03] transition-all duration-300',
+            collapsed ? 'lg:p-2' : 'p-3')}>
             <div className="flex items-center gap-2">
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
+              <span className="relative flex h-2 w-2 shrink-0">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-50" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
               </span>
-              <span className="text-[11px] font-semibold text-white/80">AI Engine Online</span>
+              <span className={cn('text-[11px] font-semibold text-white/75 transition-all duration-300', collapsed && 'lg:hidden')}>
+                AI Engine Online
+              </span>
             </div>
-            <p className="mt-1.5 font-mono text-[10px] leading-relaxed text-white/40">Groq · gemma2-9b-it<br />llama-3.3-70b-versatile</p>
+            <p className={cn('mt-1.5 font-mono text-[9.5px] leading-relaxed text-white/30 transition-all duration-300', collapsed && 'lg:hidden')}>
+              Groq · gemma2-9b-it<br />llama-3.3-70b-versatile
+            </p>
           </div>
-          <p className="mt-3 flex items-center gap-1.5 text-[10px] text-white/30"><ShieldCheck className="h-3 w-3" /> ICH Q9 · 21 CFR 211.198 · EU GMP Ch.8</p>
+        </div>
+
+        {/* user */}
+        <div className="border-t border-white/[0.06] p-3">
+          <div className={cn('flex items-center gap-2.5 rounded-lg transition-all duration-300', collapsed ? 'lg:justify-center' : 'lg:px-2')}>
+            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-gradient-to-br from-brand to-brand-glow text-[11px] font-bold text-white ring-2 ring-white/10">
+              S
+            </span>
+            <span className={cn('min-w-0 transition-all duration-300', collapsed && 'lg:hidden')}>
+              <span className="block truncate text-[12.5px] font-semibold text-white/85">Surya</span>
+              <span className="block text-[10px] text-white/35">QA Officer · Admin</span>
+            </span>
+            <Settings className={cn('ml-auto h-3.5 w-3.5 shrink-0 text-white/25 transition-all duration-300 hover:text-white/60', collapsed && 'lg:hidden')} />
+          </div>
         </div>
       </aside>
 
-      {/* ── Main ── */}
-      <div className="ml-[76px] flex min-h-screen flex-1 flex-col lg:ml-60">
-        <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-ink/8 bg-bone/85 px-6 backdrop-blur-md lg:px-8">
+      {/* ═══ MAIN ═══ */}
+      <div className={cn('flex min-h-screen flex-1 flex-col transition-[margin] duration-300 ease-[cubic-bezier(.4,0,.2,1)]',
+        collapsed ? 'ml-[76px]' : 'ml-[76px] lg:ml-[264px]')}>
+        <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-ink/[0.07] bg-bone/85 px-6 backdrop-blur-md lg:px-8">
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[.18em] text-brand">Pharos Quality Suite</p>
-            <h1 className="font-display text-lg font-bold leading-tight tracking-tight">{title}</h1>
+            <p className="text-[9px] font-bold uppercase tracking-[.22em] text-brand">Pharos Quality Suite</p>
+            <h1 className="font-display text-[17px] font-bold leading-tight tracking-tight">{title}</h1>
           </div>
           <div className="flex items-center gap-3">
-            <span className="hidden rounded-full border border-ink/10 bg-white px-3 py-1 font-mono text-[11px] text-ink/60 sm:block">{today}</span>
-            <span className="grid h-9 w-9 place-items-center rounded-full bg-brand text-xs font-bold text-white ring-2 ring-brand/25">QA</span>
+            <span className="hidden rounded-full border border-ink/10 bg-white px-3 py-1 font-mono text-[11px] text-ink/55 sm:block">{today}</span>
+            <span className="hidden items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[10px] font-semibold text-emerald-700 md:flex">
+              <ShieldCheck className="h-3 w-3" /> ICH Q9 · 21 CFR 211.198
+            </span>
+            <span className="grid h-9 w-9 place-items-center rounded-full bg-brand text-xs font-bold text-white ring-2 ring-brand/20">S</span>
           </div>
         </header>
-        <main className="dotgrid flex-1 bg-gradient-to-b from-white/60 to-transparent px-6 py-7 lg:px-8">{children}</main>
+        <main className="dotgrid flex-1 bg-gradient-to-b from-white/50 to-transparent px-6 py-7 lg:px-8">{children}</main>
       </div>
     </div>
   )
