@@ -26,12 +26,22 @@ function Kpi({ label, value, suffix = '', tone = 'text-ink', delay = 0 }) {
 export default function Dashboard() {
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const { stats, loading } = useSelector((s) => s.complaints)
+  const { stats, loading, error } = useSelector((s) => s.complaints)
 
   useEffect(() => { dispatch(fetchStats()) }, [dispatch])
 
-  if (loading && !stats) return <div className="space-y-4"><Skeleton className="h-44" /><Skeleton className="h-64" /></div>
-  if (!stats) return null
+  if (!stats) {
+    if (error) {
+      return (
+        <div className="mx-auto max-w-7xl rounded-xl border border-red-200 bg-red-50 p-8 text-center text-red-700">
+          <p className="font-bold text-base">Failed to connect to Pharos Quality Engine</p>
+          <p className="mt-1 text-xs text-red-600">{error}</p>
+          <Button variant="outline" size="sm" className="mt-4" onClick={() => dispatch(fetchStats())}>Retry Connection</Button>
+        </div>
+      )
+    }
+    return <div className="mx-auto max-w-7xl space-y-4"><Skeleton className="h-44" /><Skeleton className="h-64" /></div>
+  }
 
   const maxWeek = Math.max(1, ...stats.weekly.map((w) => w.count))
   const riskTotal = Object.values(stats.by_risk).reduce((a, b) => a + b, 0) || 1

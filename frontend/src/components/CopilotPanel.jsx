@@ -37,7 +37,7 @@ export default function CopilotPanel({ risk, completeness, duplicates, rootCause
       </Section>
 
       {/* Completeness */}
-      <Section icon={ListChecks} title="Completeness Checker" desc="Required QMS complaint fields" className={compact ? '' : 'reveal'} style>
+      <Section icon={ListChecks} title="Completeness Checker" desc="Required QMS complaint fields" className={compact ? '' : 'reveal'}>
         {completeness ? (
           <>
             <div className="flex items-end justify-between">
