@@ -18,13 +18,13 @@ const slice = createSlice({
   initialState: { stats: null, items: [], current: null, loading: false, error: null },
   reducers: { clearCurrent(s) { s.current = null } },
   extraReducers: (b) => {
-    b.addMatcher((a) => a.type.endsWith('/pending'), (s) => { s.loading = true; s.error = null })
-    b.addMatcher((a) => a.type.endsWith('/rejected'), (s, a) => { s.loading = false; s.error = a.error.message })
     b.addCase(fetchStats.fulfilled, (s, a) => { s.stats = a.payload; s.loading = false })
     b.addCase(fetchComplaints.fulfilled, (s, a) => { s.items = a.payload; s.loading = false })
     b.addCase(fetchComplaint.fulfilled, (s, a) => { s.current = a.payload; s.loading = false })
     b.addCase(createComplaint.fulfilled, (s, a) => { s.current = a.payload; s.loading = false })
     b.addCase(updateComplaint.fulfilled, (s, a) => { s.current = a.payload; s.loading = false })
+    b.addMatcher((a) => a.type.endsWith('/pending'), (s) => { s.loading = true; s.error = null })
+    b.addMatcher((a) => a.type.endsWith('/rejected'), (s, a) => { s.loading = false; s.error = a.error.message })
   },
 })
 
