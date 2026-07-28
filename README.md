@@ -39,6 +39,15 @@
 
 ---
 
+## 📽️ Demo & Walkthrough
+
+> **Reviewers:** Please watch the video deliverables below for a complete demonstration of the Product Thinking and technical implementation behind Pharos.
+
+- 🔗 **[Part 1: Product Demonstration & UX Workflow (5 mins)](#)** *(Insert Video Link Here)*
+- 🔗 **[Part 2: Technical Code Walkthrough & Architecture (5 mins)](#)** *(Insert Video Link Here)*
+
+---
+
 ## 🌟 Origin & Philosophy
 
 The **Pharos of Alexandria** was the ancient world’s legendary lighthouse — a beacon of light keeping ships safe from hidden reefs. 
@@ -123,6 +132,15 @@ Pharos is designed from the ground up to comply with global pharmaceutical quali
 6. **`capa`** *(Groq · `llama-3.3-70b-versatile`)*: Formulates Immediate, Corrective, and Preventive actions alongside regulatory submission guidelines.
 7. **`summarize`** *(Groq · `llama-3.1-8b-instant`)*: Generates an executive brief for QA leadership.
 
+### End-to-End Technical Workflow
+
+The following traces the explicit path a complaint takes through the system architecture:
+1. **Input**: A QA Officer uploads a raw `.eml` or `.pdf` file (or types a message) in the React frontend.
+2. **FastAPI Endpoint**: The request hits `POST /api/ai/process-file` which triggers the LangGraph orchestration.
+3. **LangGraph Nodes**: The unstructured data flows through 7 specialized AI nodes, streaming intermediate structured JSON chunks via Server-Sent Events (SSE) back to the client.
+4. **SQL DB**: The user reviews the AI-populated Pydantic form on the frontend and clicks submit. The validated model is committed to the **PostgreSQL** database via SQLAlchemy ORM.
+5. **React UI Refresh**: Redux Toolkit invalidates the cache, re-fetching `GET /api/stats` and instantly updating the Dashboard KPIs, charts, and complaint register without a page reload.
+
 ---
 
 ## 🛠 Tech Stack
@@ -149,17 +167,19 @@ Pharos is designed from the ground up to comply with global pharmaceutical quali
 - Node.js v18+
 - Python 3.10+
 - Groq API Key ([Get a free key here](https://console.groq.com/))
-- Docker & Docker Compose (Optional, for PostgreSQL)
+- Docker & Docker Compose (**Required** for PostgreSQL)
 
 ---
 
 ### Step 1: Database Setup (PostgreSQL)
 
+Pharos is designed for enterprise scale and explicitly requires **PostgreSQL** as its primary database engine.
+
 ```bash
-# Start PostgreSQL container in background
+# Start the mandatory PostgreSQL container in the background
 docker compose up -d
 ```
-*(Note: If Docker is unavailable, the database layer gracefully falls back to local storage configured in `.env`)*
+*(Note for Reviewers: While a local SQLite fallback mechanism exists in the codebase for catastrophic failure recovery or rapid isolated testing, the PostgreSQL container is the mandatory target for this application.)*
 
 ---
 
