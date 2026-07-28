@@ -69,12 +69,14 @@ export default function ChatPanel() {
           
           {messages.length === 0 && (
             <div className="flex h-full flex-col items-center justify-center pt-8 text-center">
-              <div className="mb-8 relative flex h-16 w-16 items-center justify-center">
-                <div className="absolute inset-0 animate-ping rounded-full bg-brand/20 [animation-duration:3s]" />
-                <div className="absolute inset-1 animate-pulse rounded-full bg-brand/30 [animation-duration:2s]" />
-                <div className="relative z-10 grid h-12 w-12 place-items-center rounded-full bg-gradient-to-br from-brand to-emerald-600 shadow-[0_0_20px_rgba(23,160,140,0.4)]">
-                  <Sparkles className="h-6 w-6 text-white" />
-                </div>
+              <div className="mb-6 grid h-16 w-16 place-items-center">
+                <svg viewBox="0 0 100 100" className="h-full w-full text-brand" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <circle cx="50" cy="50" r="44" strokeOpacity="0.2" />
+                  <circle cx="50" cy="50" r="44" strokeDasharray="80 200" strokeLinecap="round" className="animate-[spin_8s_linear_infinite]" />
+                  <circle cx="50" cy="50" r="32" strokeOpacity="0.2" />
+                  <circle cx="50" cy="50" r="32" strokeDasharray="50 150" strokeLinecap="round" className="animate-[spin_6s_linear_infinite_reverse]" />
+                  <path d="M50 38 C50 46 54 50 62 50 C54 50 50 54 50 62 C50 54 46 50 38 50 C46 50 50 46 50 38 Z" fill="currentColor" className="animate-pulse" />
+                </svg>
               </div>
               <h3 className="mb-2 text-[22px] font-semibold tracking-tight text-ink">How can I help you today?</h3>
               <p className="mb-10 max-w-sm text-[13px] leading-relaxed text-ink/50">
