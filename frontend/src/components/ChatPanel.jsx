@@ -192,10 +192,10 @@ export default function ChatPanel() {
         <div className="relative flex w-full items-end gap-2 rounded-[24px] border border-ink/15 bg-white p-2 shadow-sm transition-all focus-within:border-brand/40 focus-within:ring-4 focus-within:ring-brand/10 hover:border-ink/25">
           <button onClick={() => fileRef.current?.click()}
             className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-ink/40 transition-colors hover:bg-bone hover:text-ink/80"
-            title="Attach PDF / EML / TXT">
+            title="Attach PDF / DOCX / EML / TXT">
             <Paperclip className="h-5 w-5" />
           </button>
-          <input ref={fileRef} type="file" accept=".pdf,.eml,.txt,.md" className="hidden"
+          <input ref={fileRef} type="file" accept=".pdf,.docx,.doc,.eml,.txt,.md" className="hidden"
             onChange={(e) => { if (e.target.files?.[0]) setFileName(e.target.files[0].name) }} />
           
           <textarea ref={inputRef} rows={1} value={input}
