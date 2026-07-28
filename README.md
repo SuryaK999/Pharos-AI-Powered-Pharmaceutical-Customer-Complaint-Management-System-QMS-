@@ -115,22 +115,22 @@ Pharos is designed from the ground up to comply with global pharmaceutical quali
 
 ### LangGraph Agent Execution Flow
 
-1. **`extract`** *(Groq · `gemma2-9b-it`)*: Parses unstructured text/email into structured JSON entity fields.
-2. **`risk`** *(Groq · `gemma2-9b-it`)*: Evaluates ICH Q9 risk matrix (Severity 1–5, Probability 1–5, Score 1–25, Level).
+1. **`extract`** *(Groq · `llama-3.1-8b-instant`)*: Parses unstructured text/email into structured JSON entity fields.
+2. **`risk`** *(Groq · `llama-3.1-8b-instant`)*: Evaluates ICH Q9 risk matrix (Severity 1–5, Probability 1–5, Score 1–25, Level).
 3. **`completeness`** *(Deterministic Audit)*: Verifies presence of mandatory QMS fields and calculates percentage score.
 4. **`duplicates`** *(Deterministic Search)*: Scans recent complaint database (Batch match 45%, Product match 25%, Narrative Jaccard 30%).
 5. **`root_cause`** *(Groq · `llama-3.3-70b-versatile`)*: Performs Ishikawa categorization and builds a 5-step "Whys" investigative chain.
 6. **`capa`** *(Groq · `llama-3.3-70b-versatile`)*: Formulates Immediate, Corrective, and Preventive actions alongside regulatory submission guidelines.
-7. **`summarize`** *(Groq · `gemma2-9b-it`)*: Generates an executive brief for QA leadership.
+7. **`summarize`** *(Groq · `llama-3.1-8b-instant`)*: Generates an executive brief for QA leadership.
 
 ---
 
 ## 🛠 Tech Stack
 
 ### **Backend**
-- **Framework**: FastAPI 0.115
+- **Framework**: FastAPI 0.115 (Clean Architecture, RESTful patterns)
 - **Orchestration**: LangGraph 0.2.60
-- **LLM Engine**: Groq Client (`gemma2-9b-it` & `llama-3.3-70b-versatile`)
+- **LLM Engine**: Groq Client (`llama-3.1-8b-instant` & `llama-3.3-70b-versatile`)
 - **Database & ORM**: PostgreSQL 16 + SQLAlchemy 2.0 (with SQLite fallback support)
 - **Document Parsers**: PyPDF (`pypdf` 5.1), Python Standard Library `email`
 
@@ -188,8 +188,8 @@ cp .env.example .env
 Edit `.env` to include your Groq API Key:
 ```env
 GROQ_API_KEY=gsk_your_groq_token_here
-DATABASE_URL=postgresql://aivoa:aivoa@localhost:5432/aivoa_qms
-MODEL_PRIMARY=gemma2-9b-it
+DATABASE_URL=postgresql://owner:surya@localhost:5432/pharos_qms
+MODEL_PRIMARY=llama-3.1-8b-instant
 MODEL_CONTEXT=llama-3.3-70b-versatile
 ```
 
@@ -234,7 +234,7 @@ Pharos employs a dual-model hybrid architecture on Groq's high-speed LPU infrast
                    ┌─────────────────────┴─────────────────────┐
                    ▼                                           ▼
        Fast Extraction & Risk                      Deep Reasoning & CAPA
-         (gemma2-9b-it)                          (llama-3.3-70b-versatile)
+       (llama-3.1-8b-instant)                    (llama-3.3-70b-versatile)
  ─────────┬──────────────────────────── ───────────┬───────────────────────────
           ├─ Parse entities                        ├─ Ishikawa Category & 5 Whys
           ├─ ICH Q9 Risk Matrix                    ├─ Corrective & Preventive Actions
@@ -269,6 +269,7 @@ data: {"type": "done"}
 | `/api/health` | `GET` | Health check and active AI models status |
 | `/api/ai/process-text` | `POST` | Process raw complaint text via LangGraph SSE stream |
 | `/api/ai/process-file` | `POST` | Process uploaded PDF/EML/TXT file via LangGraph SSE stream |
+| `/api/samples` | `GET` | Fetch modular `.eml` and `.txt` pharmaceutical samples |
 | `/api/complaints` | `GET` | List complaints with search (`q`), `status`, and `risk` filters |
 | `/api/complaints/{id}` | `GET` | Retrieve single complaint record with activity audit trail |
 | `/api/complaints` | `POST` | Commit new reviewed complaint to the QMS database |
@@ -287,14 +288,17 @@ Pharos/
 │   ├── .env.example                    # Environment template
 │   ├── seed.py                         # Seed database with pharma complaint data
 │   ├── samples/
-│   │   └── sample_complaint.eml        # Sample EML file for testing
+│   │   ├── sample_complaint.eml        # Sample patient EML
+│   │   ├── distributor_report.eml      # Sample B2B distributor EML
+│   │   ├── clinical_feedback.txt       # Sample physician text report
+│   │   └── customer_call.txt           # Sample call center transcript
 │   └── app/
 │       ├── main.py                     # FastAPI app initialization & middleware
 │       ├── core/
 │       │   ├── config.py               # Pydantic settings & environment vars
 │       │   └── database.py             # SQLAlchemy engine & session factory
 │       ├── models/
-│       │   └── complaint.py            # SQLAlchemy database models (Complaint & Activity)
+│       │   └── complaint.py            # SQLAlchemy database models
 │       ├── schemas/
 │       │   └── complaint.py            # Pydantic response/request schemas
 │       ├── ai/
@@ -305,7 +309,8 @@ Pharos/
 │       │   └── documents.py            # Document parsing service (PDF, EML, TXT)
 │       └── api/
 │           └── routes/
-│               └── complaints.py       # API endpoints (SSE intake, CRUD, Dashboard)
+│               ├── complaints.py       # Main API endpoints (SSE, CRUD)
+│               └── samples.py          # Modular samples API router
 └── frontend/
     ├── package.json                    # Frontend dependencies & scripts
     ├── vite.config.js                  # Vite configuration & path aliases
@@ -318,22 +323,17 @@ Pharos/
         ├── lib/
         │   ├── utils.js                # Tailwind class merge helper (`cn`)
         │   └── api.js                  # API fetch client & SSE stream consumer
-        ├── hooks/
-        │   └── useCountUp.js           # Animated numeric counter hook
         ├── store/
-        │   ├── index.js                # Redux Store configuration
-        │   ├── complaintsSlice.js      # Complaints list, detail, & stats state
+        │   ├── complaintsSlice.js      # Complaints & Stats Redux slice
         │   └── intakeSlice.js          # Live AI intake streaming state
         ├── components/
         │   ├── AppShell.jsx            # Main app shell with sidebar & header
         │   ├── badges.jsx              # Status, Risk, and Type badge components
         │   ├── RiskGauge.jsx           # Animated 180° ICH Q9 risk gauge
+        │   ├── ChatPanel.jsx           # ChatGPT-style modular Copilot interaction UI
         │   ├── CopilotPanel.jsx        # AI Copilot analysis & recommendations view
         │   ├── ExtractionProgress.jsx  # Live LangGraph node progress indicator
         │   └── ui/                     # Reusable UI primitives
-        │       ├── button.jsx, badge.jsx, card.jsx, input.jsx, textarea.jsx,
-        │       ├── label.jsx, select.jsx, tabs.jsx, progress.jsx, separator.jsx,
-        │       └── skeleton.jsx, table.jsx, sonner.jsx
         └── pages/
             ├── Dashboard.jsx           # Quality Dashboard page
             ├── Complaints.jsx          # Filterable Complaint Register page
@@ -348,22 +348,21 @@ Pharos/
 Follow these steps for a complete feature demonstration:
 
 1. **Dashboard Overview**: Navigate to `http://localhost:5173/`. Observe live KPIs (Total, Open, Critical Open, Avg Completeness), 8-week intake trend bar graph, ICH Q9 risk distribution bar, and recent complaint activity.
-2. **AI Intake via Sample Text**:
-   - Click **Log Complaint with AI**.
-   - Click **"Load sample: packaging defect"** (populates an email regarding Amoxicillin 500 mg Capsules, Batch `AMX-24091`).
-   - Click **Run AI Intake Pipeline**.
-   - Watch the 7 LangGraph nodes execute in real time on the progress panel.
+2. **AI Intake via Chatbot Samples**:
+   - Click **Log Complaint** on the sidebar.
+   - You will see the **Pharos Copilot** chat interface and a grid of professional modular sample cards (e.g., "Patient Report", "Distributor Email").
+   - Click the **Distributor Email** sample card to inject a rich `.eml` extraction scenario directly into the chat.
+   - Click the **Send (Submit)** button.
+   - Watch the 7 LangGraph nodes execute in real time on the extraction panel!
    - Observe auto-filled form fields with subtle flash highlight animations.
-   - Inspect the **AI Copilot** panels: Risk Assessment (High risk, score 16), Duplicate Detection alert (**matches existing record CC-2026-0038**), Completeness score, Root Cause analysis, and CAPA recommendations.
-3. **Submit Complaint**: Click **Submit Complaint**. The record is saved as `CC-2026-0041` and redirects to the detail page.
+   - Inspect the right-hand **AI Copilot** panels: Risk Assessment, Duplicate Detection alert (**matches existing records**), Completeness score, Ishikawa Root Cause analysis, and regulatory CAPA recommendations.
+3. **Submit Complaint**: Click **Submit Complaint**. The record is saved to PostgreSQL and redirects to the detailed timeline view.
 4. **Adverse Event Handling**:
-   - Click **Log Complaint**.
-   - Click **"Load sample: adverse event"** (populates Ceftriaxone injection contamination with patient fever).
-   - Run AI Intake and observe the **Critical Risk (Score 15)** classification and automatic **Pharmacovigilance Flag**.
-5. **Document Upload Intake**:
-   - Switch to the **Upload Document** tab.
-   - Select or drag-and-drop `backend/samples/sample_complaint.eml`.
-   - Watch the pipeline parse the file and auto-populate the record.
+   - Log another complaint using the **Clinical Feedback** sample.
+   - Run AI Intake and observe the **Critical Risk (Score 15)** classification and automatic **Pharmacovigilance Flag** due to patient harm!
+5. **Conversational Editing**:
+   - Instead of manually clicking fields, type into the Copilot chat: *"change the quantity affected to 1,500 vials and set the batch to unknown"*.
+   - Watch the AI instantly parse your intent, update the JSON payload, and flash-highlight the corrected fields in the UI!
 
 ---
 
