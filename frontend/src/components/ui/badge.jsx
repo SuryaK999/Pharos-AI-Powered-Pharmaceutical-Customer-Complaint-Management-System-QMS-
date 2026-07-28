@@ -22,4 +22,4 @@ const badgeVariants = cva(
 const Badge = ({ className, variant, ...props }) => (
   <span className={cn(badgeVariants({ variant }), className)} {...props} />
 )
-export { Badge, badgeVariants }
+export { Badge }

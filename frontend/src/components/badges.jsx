@@ -1,7 +1,7 @@
 import { Badge } from './ui/badge'
 import { AlertTriangle } from 'lucide-react'
 
-export const STATUS_META = {
+const STATUS_META = {
   draft: { label: 'Draft', variant: 'outline' },
   submitted: { label: 'Submitted', variant: 'info' },
   under_review: { label: 'Under Review', variant: 'warning' },

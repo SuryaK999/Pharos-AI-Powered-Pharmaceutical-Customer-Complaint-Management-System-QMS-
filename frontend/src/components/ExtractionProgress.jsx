@@ -1,7 +1,7 @@
 import { Check, Loader2, Circle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-export const PIPELINE_NODES = [
+const PIPELINE_NODES = [
   { key: 'extract', label: 'Parse & extract entities', sub: 'Groq · gemma2-9b-it' },
   { key: 'agent_risk', label: 'ICH Q9 risk classification', sub: 'Severity × Probability matrix' },
   { key: 'agent_completeness', label: 'Completeness check', sub: 'Required QMS fields' },
