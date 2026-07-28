@@ -21,7 +21,11 @@ Return ONLY JSON:
  "source_channel": one of [email|phone|portal|letter|verbal|other],
  "description": "concise 2-3 sentence factual summary"
 }
-Rules: classification=critical for sterility/patient-safety/regulatory risk. adverse_event=true ONLY if patient harm described. Preserve batch numbers exactly."""
+Rules: 
+- classification=critical for sterility/patient-safety/regulatory risk. 
+- adverse_event=true ONLY if patient harm described. 
+- Preserve batch numbers exactly.
+- MULTIPLE PRODUCTS: If the transcript/document mentions multiple products, extract fields ONLY for the most SEVERE/CRITICAL product (e.g., sterile injectables, critical defects). Mention the other products briefly in the description. Ensure you output a single JSON object, NOT an array."""
 
 EDIT_SYSTEM = """You are a QA assistant. The user wants to modify specific fields of the current complaint.
 CURRENT FORM STATE:
