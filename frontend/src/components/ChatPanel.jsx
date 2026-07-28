@@ -68,27 +68,25 @@ export default function ChatPanel() {
         <div className="mx-auto flex max-w-3xl flex-col pb-8 pt-4">
           
           {messages.length === 0 && (
-            <div className="flex h-full flex-col items-center justify-center pt-10 text-center">
-              <div className="mb-6 grid h-16 w-16 place-items-center rounded-full bg-brand/5">
-                <Sparkles className="h-8 w-8 text-brand" />
+            <div className="flex h-full flex-col items-center justify-center pt-8 text-center">
+              <div className="mb-5 grid h-14 w-14 place-items-center rounded-full bg-brand/5">
+                <Sparkles className="h-7 w-7 text-brand" />
               </div>
-              <h3 className="mb-2 text-xl font-semibold tracking-tight text-ink">How can I help you today?</h3>
-              <p className="mb-8 max-w-sm text-sm text-ink/60">
-                I can instantly populate the complaint form, edit specific fields, or extract details from documents.
+              <h3 className="mb-2 text-[22px] font-semibold tracking-tight text-ink">How can I help you today?</h3>
+              <p className="mb-10 max-w-sm text-[13px] leading-relaxed text-ink/50">
+                Instantly populate the complaint form, edit specific fields, or extract details from documents.
               </p>
-              <div className="grid w-full max-w-2xl gap-3 sm:grid-cols-3">
+              
+              <div className="flex w-full max-w-2xl flex-wrap justify-center gap-2.5">
                 {CAPS.map((c, i) => (
                   <button key={i} onClick={() => c.prompt && send(c.prompt)}
-                    className={cn('group flex flex-col items-start gap-3 rounded-2xl border border-ink/5 bg-bone/30 p-4 text-left transition-all hover:bg-bone/80',
-                      c.prompt ? 'cursor-pointer hover:border-ink/10' : 'cursor-default')}
+                    className={cn('group flex items-center gap-2.5 rounded-full border border-ink/10 bg-white px-4 py-2.5 transition-all hover:bg-bone hover:border-ink/20 shadow-sm',
+                      c.prompt ? 'cursor-pointer' : 'cursor-default')}
                     style={{ animation: `fadeUp .4s ${i * 100}ms both` }}>
-                    <span className="grid h-8 w-8 place-items-center rounded-full bg-white text-ink/70 shadow-sm transition-transform group-hover:scale-110 group-hover:text-brand">
+                    <span className="text-brand transition-transform group-hover:scale-110">
                       <c.icon className="h-4 w-4" />
                     </span>
-                    <div>
-                      <span className="block text-sm font-medium text-ink">{c.title}</span>
-                      <span className="mt-1 block text-xs leading-relaxed text-ink/50">{c.desc}</span>
-                    </div>
+                    <span className="text-[13px] font-medium text-ink/80 group-hover:text-ink">{c.title}</span>
                   </button>
                 ))}
               </div>

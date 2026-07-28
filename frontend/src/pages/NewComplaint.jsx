@@ -52,7 +52,7 @@ export default function NewComplaint() {
   return (
     <div className="mx-auto grid max-w-[1500px] gap-5 xl:grid-cols-12">
       {/* ═══ LEFT: Form + Risk ═══ */}
-      <div className="space-y-5 xl:col-span-6">
+      <div className="space-y-5 xl:col-span-5">
         <Card className="reveal">
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
@@ -171,7 +171,7 @@ export default function NewComplaint() {
       </div>
 
       {/* ═══ RIGHT: AI Chat ═══ */}
-      <div className="xl:col-span-6">
+      <div className="order-first xl:order-none xl:col-span-7">
         <Card className="reveal sticky top-20 flex h-[calc(100vh-120px)] flex-col overflow-hidden border-0 shadow-none ring-1 ring-ink/[0.05]" style={{ animationDelay: '100ms' }}>
           <ChatPanel />
         </Card>
