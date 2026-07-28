@@ -1,5 +1,8 @@
-import io, email
+import email
+import io
+
 from pypdf import PdfReader
+
 
 def parse_upload(filename: str, content: bytes) -> str:
     """Lightweight document parsing (production OCR intentionally out of scope)."""

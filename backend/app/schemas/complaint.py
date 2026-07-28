@@ -1,26 +1,28 @@
-from pydantic import BaseModel, ConfigDict
-from typing import Optional, Any
 from datetime import datetime
+from typing import Any
+
+from pydantic import BaseModel, ConfigDict
+
 
 class ActivityOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
-    id: str; action: str; actor: str; details: Optional[str]; created_at: datetime
+    id: str; action: str; actor: str; details: str | None; created_at: datetime
 
 class ComplaintOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: str; complaint_number: str; status: str
-    source_channel: Optional[str]; source_filename: Optional[str]; raw_text: Optional[str]
-    complainant_name: Optional[str]; complainant_org: Optional[str]; email: Optional[str]; country: Optional[str]
-    product_name: Optional[str]; product_code: Optional[str]; product_strength: Optional[str]
-    batch_number: Optional[str]; dosage_form: Optional[str]; grade: Optional[str]
-    manufacturing_date: Optional[str]; expiry_date: Optional[str]
-    complaint_type: Optional[str]; classification: Optional[str]; adverse_event: bool
-    quantity_affected: Optional[str]; date_received: Optional[str]; description: Optional[str]
-    risk_severity: Optional[int]; risk_probability: Optional[int]; risk_score: Optional[int]
-    risk_level: Optional[str]; risk_rationale: Optional[str]
-    completeness_score: Optional[float]; missing_fields: Optional[list]
-    is_duplicate: bool; duplicate_of: Optional[str]; duplicate_candidates: Optional[list]
-    root_cause: Optional[Any]; capa: Optional[Any]; summary: Optional[str]
+    source_channel: str | None; source_filename: str | None; raw_text: str | None
+    complainant_name: str | None; complainant_org: str | None; email: str | None; country: str | None
+    product_name: str | None; product_code: str | None; product_strength: str | None
+    batch_number: str | None; dosage_form: str | None; grade: str | None
+    manufacturing_date: str | None; expiry_date: str | None
+    complaint_type: str | None; classification: str | None; adverse_event: bool
+    quantity_affected: str | None; date_received: str | None; description: str | None
+    risk_severity: int | None; risk_probability: int | None; risk_score: int | None
+    risk_level: str | None; risk_rationale: str | None
+    completeness_score: float | None; missing_fields: list | None
+    is_duplicate: bool; duplicate_of: str | None; duplicate_candidates: list | None
+    root_cause: Any | None; capa: Any | None; summary: str | None
     created_at: datetime; updated_at: datetime
     activities: list[ActivityOut] = []
 
@@ -29,8 +31,8 @@ class ComplaintCreate(BaseModel):
     ai: dict = {}
 
 class ComplaintUpdate(BaseModel):
-    status: Optional[str] = None
-    fields: Optional[dict] = None
+    status: str | None = None
+    fields: dict | None = None
 
 class ProcessTextIn(BaseModel):
     text: str
@@ -54,5 +56,5 @@ class ChatResponse(BaseModel):
     reply: str
     action: str
     form_updates: dict = {}
-    risk_assessment: Optional[Any] = None
+    risk_assessment: Any | None = None
     duplicates: list = []

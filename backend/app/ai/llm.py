@@ -1,5 +1,8 @@
-import json, re
+import json
+import re
+
 from groq import Groq
+
 from ..core.config import settings
 
 _client = None

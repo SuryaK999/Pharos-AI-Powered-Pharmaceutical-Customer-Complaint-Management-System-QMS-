@@ -1,7 +1,8 @@
 """Seed realistic pharmaceutical complaint records (API + FDF). Run: python seed.py"""
 from datetime import datetime, timedelta
-from app.core.database import SessionLocal, engine, Base
-from app.models.complaint import Complaint, Activity
+
+from app.core.database import Base, SessionLocal, engine
+from app.models.complaint import Activity, Complaint
 
 Base.metadata.create_all(bind=engine)
 db = SessionLocal()

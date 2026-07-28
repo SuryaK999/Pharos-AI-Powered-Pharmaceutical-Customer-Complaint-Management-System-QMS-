@@ -1,6 +1,7 @@
 import json
-from .llm import complete
+
 from ..models.complaint import Complaint
+from .llm import complete
 
 ANALYSIS_SYSTEM_PROMPT = """You are an expert Pharmaceutical Quality Assurance (QA) and QMS AI assistant.
 Your task is to analyze a logged complaint and generate a structured JSON object containing three sections: root_cause, capa, and summary.

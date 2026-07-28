@@ -1,14 +1,21 @@
 import json
 from datetime import datetime, timedelta
-from fastapi import APIRouter, Depends, UploadFile, File, HTTPException, Form
+
+from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from fastapi.responses import StreamingResponse
-from sqlalchemy.orm import Session
 from sqlalchemy import func
-from ...core.database import get_db
-from ...models.complaint import Complaint, Activity
-from ...schemas.complaint import (ComplaintOut, ComplaintCreate, ComplaintUpdate,
-                                  ProcessTextIn, StatsOut, ChatRequest, ChatResponse)
+from sqlalchemy.orm import Session
+
 from ...ai.graph import CHAT_GRAPH
+from ...core.database import get_db
+from ...models.complaint import Activity, Complaint
+from ...schemas.complaint import (
+    ChatRequest,
+    ComplaintCreate,
+    ComplaintOut,
+    ComplaintUpdate,
+    StatsOut,
+)
 from ...services.documents import parse_upload
 
 router = APIRouter()
@@ -166,7 +173,7 @@ def analyze_complaint_endpoint(cid: str, db: Session = Depends(get_db)):
         db.refresh(c)
         return c
     except Exception as e:
-        raise HTTPException(500, f"AI analysis failed: {str(e)}")
+        raise HTTPException(500, f"AI analysis failed: {e!s}")
 
 # ── Dashboard ──────────────────────────────────────────
 @router.get("/stats", response_model=StatsOut)

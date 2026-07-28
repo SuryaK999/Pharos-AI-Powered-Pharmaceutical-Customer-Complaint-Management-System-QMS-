@@ -1,5 +1,6 @@
 from pydantic_settings import BaseSettings
 
+
 class Settings(BaseSettings):
     app_name: str = "Pharos - Customer Complaint Management"
     database_url: str = "postgresql://owner:surya@localhost:5432/pharos_qms"

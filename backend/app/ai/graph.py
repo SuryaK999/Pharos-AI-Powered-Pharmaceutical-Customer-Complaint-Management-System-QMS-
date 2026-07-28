@@ -6,12 +6,13 @@
 import json as _json
 import re
 from typing import TypedDict
-from langgraph.graph import StateGraph, START, END
-from .llm import complete
-from . import prompts
-from ..core.config import settings
+
+from langgraph.graph import END, START, StateGraph
+
 from ..core.database import SessionLocal
 from ..models.complaint import Complaint
+from . import prompts
+from .llm import complete
 
 
 class ChatState(TypedDict, total=False):
