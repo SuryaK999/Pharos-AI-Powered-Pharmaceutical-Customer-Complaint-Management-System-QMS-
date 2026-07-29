@@ -23,6 +23,23 @@
 
 <br />
 
+---
+
+## 🌟 App Showcase
+
+Here are some showcase images from the Pharos application:
+
+### Pharos Dashboard
+![Pharos Dashboard](./assets/pharos_dashboard.png)
+
+### Pharos AI Intake
+![Pharos AI Intake](./assets/pharos_ai_intake.png)
+
+### Pharos Risk Assessment
+![Pharos Risk Assessment](./assets/pharos_risk_assessment.png)
+
+---
+
 ## 📽️ Demo & Walkthrough
 
 > **Reviewers:** Please watch the video deliverables below for a complete demonstration of the Product Thinking and technical implementation behind Pharos.
@@ -43,59 +60,21 @@
 
 ---
 
-## 🎬 Demo Walkthrough Guide
-
-Follow these steps for a complete feature demonstration:
-
-1. **Dashboard Overview**: Navigate to `http://localhost:5173/`. Observe live KPIs (Total, Open, Critical Open, Avg Completeness), 8-week intake trend bar graph, ICH Q9 risk distribution bar, and recent complaint activity.
-2. **AI Intake via Chatbot Samples**:
-   - Click **Log Complaint** on the sidebar.
-   - You will see the **Pharos Copilot** chat interface and a grid of professional modular sample cards (e.g., "Patient Report", "Distributor Email").
-   - Click the **Distributor Email** sample card to inject a rich `.eml` extraction scenario directly into the chat.
-   - Click the **Send (Submit)** button.
-   - Watch the 7 LangGraph nodes execute in real time on the extraction panel!
-   - Observe auto-filled form fields with subtle flash highlight animations.
-   - Inspect the right-hand **AI Copilot** panels: Risk Assessment, Duplicate Detection alert (**matches existing records**), Completeness score, Ishikawa Root Cause analysis, and regulatory CAPA recommendations.
-3. **Submit Complaint**: Click **Submit Complaint**. The record is saved to PostgreSQL and redirects to the detailed timeline view.
-4. **Adverse Event Handling**:
-   - Log another complaint using the **Clinical Feedback** sample.
-   - Run AI Intake and observe the **Critical Risk (Score 15)** classification and automatic **Pharmacovigilance Flag** due to patient harm!
-5. **Conversational Editing**:
-   - Instead of manually clicking fields, type into the Copilot chat: *"change the quantity affected to 1,500 vials and set the batch to unknown"*.
-   - Watch the AI instantly parse your intent, update the JSON payload, and flash-highlight the corrected fields in the UI!
-
----
-
-## 🌟 App Showcase
-
-Here are some showcase images from the Pharos application:
-
-### Pharos Dashboard
-![Pharos Dashboard](./assets/pharos_dashboard.png)
-
-### Pharos AI Intake
-![Pharos AI Intake](./assets/pharos_ai_intake.png)
-
-### Pharos Risk Assessment
-![Pharos Risk Assessment](./assets/pharos_risk_assessment.png)
-
----
-
 ## 📋 Table of Contents
 
-1. [📽️ Demo & Walkthrough](#️-demo--walkthrough)
-2. [🎬 Demo Walkthrough Guide](#-demo-walkthrough-guide)
-3. [🌟 App Showcase](#-app-showcase)
-4. [🌟 Origin & Philosophy](#-origin--philosophy)
-5. [✨ Key Features](#-key-features)
-6. [🏛 Regulatory Compliance](#-regulatory-compliance)
-7. [🏗 Architecture & LangGraph Pipeline](#-architecture--langgraph-pipeline)
-8. [🛠 Tech Stack](#-tech-stack)
-9. [🚀 Quickstart & Installation](#-quickstart--installation)
-10. [🤖 AI Model Strategy](#-ai-model-strategy)
-11. [📡 Real-Time SSE Event Streaming](#-real-time-sse-event-streaming)
-12. [🔌 API Reference](#-api-reference)
-13. [📂 Project Structure](#-project-structure)
+1. [🌟 App Showcase](#-app-showcase)
+2. [📽️ Demo & Walkthrough](#️-demo--walkthrough)
+3. [🌟 Origin & Philosophy](#-origin--philosophy)
+4. [✨ Key Features](#-key-features)
+5. [🏛 Regulatory Compliance](#-regulatory-compliance)
+6. [🏗 Architecture & LangGraph Pipeline](#-architecture--langgraph-pipeline)
+7. [🛠 Tech Stack](#-tech-stack)
+8. [🚀 Quickstart & Installation](#-quickstart--installation)
+9. [🤖 AI Model Strategy](#-ai-model-strategy)
+10. [📡 Real-Time SSE Event Streaming](#-real-time-sse-event-streaming)
+11. [🔌 API Reference](#-api-reference)
+12. [📂 Project Structure](#-project-structure)
+13. [🎬 Demo Walkthrough Guide](#-demo-walkthrough-guide)
 
 ---
 
@@ -222,77 +201,6 @@ The following traces the explicit path a complaint takes through the system arch
 
 ---
 
-### Step 1: Database Setup (PostgreSQL)
-
-Pharos is designed for enterprise scale and explicitly requires **PostgreSQL** as its primary database engine.
-
-```bash
-# Start the mandatory PostgreSQL container in the background
-docker compose up -d
-```
-*(Note for Reviewers: While a local SQLite fallback mechanism exists in the codebase for catastrophic failure recovery or rapid isolated testing, the PostgreSQL container is the mandatory target for this application.)*
-
----
-
-### Step 2: Backend Setup
-
-```bash
-# Navigate to backend directory
-cd backend
-
-# Create virtual environment
-python -m venv .venv
-
-# Activate virtual environment
-# On Linux/macOS:
-source .venv/bin/activate
-# On Windows PowerShell:
-# .venv\Scripts\Activate.ps1
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Copy environment configuration & edit your Groq API key
-cp .env.example .env
-```
-
-Edit `.env` to include your Groq API Key:
-```env
-GROQ_API_KEY=gsk_your_groq_token_here
-DATABASE_URL=postgresql://owner:surya@localhost:5432/pharos_qms
-MODEL_PRIMARY=gemma2-9b-it
-MODEL_CONTEXT=llama-3.3-70b-versatile
-```
-
-Seed the database with 10 realistic pharmaceutical complaints:
-```bash
-python seed.py
-```
-
-Launch the FastAPI server:
-```bash
-uvicorn app.main:app --reload --port 8000
-```
-*Backend API available at: `http://localhost:8000` | API Docs at `http://localhost:8000/docs`*
-
----
-
-### Step 3: Frontend Setup
-
-```bash
-# Navigate to frontend directory
-cd frontend
-
-# Install Node dependencies
-npm install
-
-# Start Vite development server
-npm run dev
-```
-*Frontend Application available at: `http://localhost:5173`*
-
----
-
 ## 🤖 AI Model Strategy
 
 Pharos employs a dual-model hybrid architecture on Groq's high-speed LPU infrastructure:
@@ -411,6 +319,29 @@ Pharos/
             ├── NewComplaint.jsx        # AI Intake & Log Complaint workspace
             └── ComplaintDetail.jsx     # Detailed Complaint record & timeline view
 ```
+
+---
+
+## 🎬 Demo Walkthrough Guide
+
+Follow these steps for a complete feature demonstration:
+
+1. **Dashboard Overview**: Navigate to `http://localhost:5173/`. Observe live KPIs (Total, Open, Critical Open, Avg Completeness), 8-week intake trend bar graph, ICH Q9 risk distribution bar, and recent complaint activity.
+2. **AI Intake via Chatbot Samples**:
+   - Click **Log Complaint** on the sidebar.
+   - You will see the **Pharos Copilot** chat interface and a grid of professional modular sample cards (e.g., "Patient Report", "Distributor Email").
+   - Click the **Distributor Email** sample card to inject a rich `.eml` extraction scenario directly into the chat.
+   - Click the **Send (Submit)** button.
+   - Watch the 7 LangGraph nodes execute in real time on the extraction panel!
+   - Observe auto-filled form fields with subtle flash highlight animations.
+   - Inspect the right-hand **AI Copilot** panels: Risk Assessment, Duplicate Detection alert (**matches existing records**), Completeness score, Ishikawa Root Cause analysis, and regulatory CAPA recommendations.
+3. **Submit Complaint**: Click **Submit Complaint**. The record is saved to PostgreSQL and redirects to the detailed timeline view.
+4. **Adverse Event Handling**:
+   - Log another complaint using the **Clinical Feedback** sample.
+   - Run AI Intake and observe the **Critical Risk (Score 15)** classification and automatic **Pharmacovigilance Flag** due to patient harm!
+5. **Conversational Editing**:
+   - Instead of manually clicking fields, type into the Copilot chat: *"change the quantity affected to 1,500 vials and set the batch to unknown"*.
+   - Watch the AI instantly parse your intent, update the JSON payload, and flash-highlight the corrected fields in the UI!
 
 ---
 
