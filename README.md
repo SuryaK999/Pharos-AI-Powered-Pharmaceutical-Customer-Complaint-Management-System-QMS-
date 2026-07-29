@@ -43,6 +43,29 @@
 
 ---
 
+## 🎬 Demo Walkthrough Guide
+
+Follow these steps for a complete feature demonstration:
+
+1. **Dashboard Overview**: Navigate to `http://localhost:5173/`. Observe live KPIs (Total, Open, Critical Open, Avg Completeness), 8-week intake trend bar graph, ICH Q9 risk distribution bar, and recent complaint activity.
+2. **AI Intake via Chatbot Samples**:
+   - Click **Log Complaint** on the sidebar.
+   - You will see the **Pharos Copilot** chat interface and a grid of professional modular sample cards (e.g., "Patient Report", "Distributor Email").
+   - Click the **Distributor Email** sample card to inject a rich `.eml` extraction scenario directly into the chat.
+   - Click the **Send (Submit)** button.
+   - Watch the 7 LangGraph nodes execute in real time on the extraction panel!
+   - Observe auto-filled form fields with subtle flash highlight animations.
+   - Inspect the right-hand **AI Copilot** panels: Risk Assessment, Duplicate Detection alert (**matches existing records**), Completeness score, Ishikawa Root Cause analysis, and regulatory CAPA recommendations.
+3. **Submit Complaint**: Click **Submit Complaint**. The record is saved to PostgreSQL and redirects to the detailed timeline view.
+4. **Adverse Event Handling**:
+   - Log another complaint using the **Clinical Feedback** sample.
+   - Run AI Intake and observe the **Critical Risk (Score 15)** classification and automatic **Pharmacovigilance Flag** due to patient harm!
+5. **Conversational Editing**:
+   - Instead of manually clicking fields, type into the Copilot chat: *"change the quantity affected to 1,500 vials and set the batch to unknown"*.
+   - Watch the AI instantly parse your intent, update the JSON payload, and flash-highlight the corrected fields in the UI!
+
+---
+
 ## 🌟 App Showcase
 
 Here are some showcase images from the Pharos application:
@@ -60,17 +83,19 @@ Here are some showcase images from the Pharos application:
 
 ## 📋 Table of Contents
 
-1. [🌟 Origin & Philosophy](#-origin--philosophy)
-2. [✨ Key Features](#-key-features)
-3. [🏛 Regulatory Compliance](#-regulatory-compliance)
-4. [🏗 Architecture & LangGraph Pipeline](#-architecture--langgraph-pipeline)
-5. [🛠 Tech Stack](#-tech-stack)
-6. [🚀 Quickstart & Installation](#-quickstart--installation)
-7. [🤖 AI Model Strategy](#-ai-model-strategy)
-8. [📡 Real-Time SSE Event Streaming](#-real-time-sse-event-streaming)
-9. [🔌 API Reference](#-api-reference)
-10. [📂 Project Structure](#-project-structure)
-11. [🎬 Demo Walkthrough Guide](#-demo-walkthrough-guide)
+1. [📽️ Demo & Walkthrough](#️-demo--walkthrough)
+2. [🎬 Demo Walkthrough Guide](#-demo-walkthrough-guide)
+3. [🌟 App Showcase](#-app-showcase)
+4. [🌟 Origin & Philosophy](#-origin--philosophy)
+5. [✨ Key Features](#-key-features)
+6. [🏛 Regulatory Compliance](#-regulatory-compliance)
+7. [🏗 Architecture & LangGraph Pipeline](#-architecture--langgraph-pipeline)
+8. [🛠 Tech Stack](#-tech-stack)
+9. [🚀 Quickstart & Installation](#-quickstart--installation)
+10. [🤖 AI Model Strategy](#-ai-model-strategy)
+11. [📡 Real-Time SSE Event Streaming](#-real-time-sse-event-streaming)
+12. [🔌 API Reference](#-api-reference)
+13. [📂 Project Structure](#-project-structure)
 
 ---
 
@@ -386,29 +411,6 @@ Pharos/
             ├── NewComplaint.jsx        # AI Intake & Log Complaint workspace
             └── ComplaintDetail.jsx     # Detailed Complaint record & timeline view
 ```
-
----
-
-## 🎬 Demo Walkthrough Guide
-
-Follow these steps for a complete feature demonstration:
-
-1. **Dashboard Overview**: Navigate to `http://localhost:5173/`. Observe live KPIs (Total, Open, Critical Open, Avg Completeness), 8-week intake trend bar graph, ICH Q9 risk distribution bar, and recent complaint activity.
-2. **AI Intake via Chatbot Samples**:
-   - Click **Log Complaint** on the sidebar.
-   - You will see the **Pharos Copilot** chat interface and a grid of professional modular sample cards (e.g., "Patient Report", "Distributor Email").
-   - Click the **Distributor Email** sample card to inject a rich `.eml` extraction scenario directly into the chat.
-   - Click the **Send (Submit)** button.
-   - Watch the 7 LangGraph nodes execute in real time on the extraction panel!
-   - Observe auto-filled form fields with subtle flash highlight animations.
-   - Inspect the right-hand **AI Copilot** panels: Risk Assessment, Duplicate Detection alert (**matches existing records**), Completeness score, Ishikawa Root Cause analysis, and regulatory CAPA recommendations.
-3. **Submit Complaint**: Click **Submit Complaint**. The record is saved to PostgreSQL and redirects to the detailed timeline view.
-4. **Adverse Event Handling**:
-   - Log another complaint using the **Clinical Feedback** sample.
-   - Run AI Intake and observe the **Critical Risk (Score 15)** classification and automatic **Pharmacovigilance Flag** due to patient harm!
-5. **Conversational Editing**:
-   - Instead of manually clicking fields, type into the Copilot chat: *"change the quantity affected to 1,500 vials and set the batch to unknown"*.
-   - Watch the AI instantly parse your intent, update the JSON payload, and flash-highlight the corrected fields in the UI!
 
 ---
 
