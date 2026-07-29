@@ -41,9 +41,9 @@ Here are some showcase images from the Pharos application:
 
 ![Pharos Risk Assessment](./assets/pharos_risk_assessment.png)
 
-### Duplicate Detection
+### Pharos AI Intake 2
 
-![Duplicate Detection](./assets/pharos_duplicate_detection.png)
+![Pharos AI Intake 2](./assets/pharos_ai_intake2.png)
 
 ---
 
