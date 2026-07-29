@@ -55,15 +55,15 @@ Here are some showcase images from the Pharos application:
 
 *A complete demonstration of the live dashboard, AI extraction, real-time SSE progress, and ICH Q9 Risk generation.*
 
-🎥 **[Click Here to Watch Part 1: Product Demonstration](https://github.com/SuryaK999/Pharos-AI-Powered-Pharmaceutical-Customer-Complaint-Management-System-QMS-/blob/main/pharos_demo-1.mp4)**  
-*(Click the link above to open the video in GitHub's built-in player)*
+🎥 **[Click Here to Watch Part 1: Product Demonstration (Google Drive)](https://drive.google.com/file/d/1C7qyVUWwHqmJUxp-JQr2P3c45dVM_nJY/view?usp=sharing)**  
+*(Click the link above to view the video)*
 
 ### Part 2: Technical Code Walkthrough & Architecture (5 mins)
 
 *An architectural deep dive into the FastAPI backend, LangGraph state engine, Redux state management, and PostgreSQL persistence.*
 
-🎥 **[Click Here to Watch Part 2: Technical Walkthrough](https://github.com/SuryaK999/Pharos-AI-Powered-Pharmaceutical-Customer-Complaint-Management-System-QMS-/blob/main/pharos_demo-2.mp4)**  
-*(Click the link above to open the video in GitHub's built-in player)*
+🎥 **[Click Here to Watch Part 2: Technical Walkthrough (Google Drive)](https://drive.google.com/file/d/13l8DBRcy41Nyi-wwbVroS6FR_6Ga6uAY/view?usp=sharing)**  
+*(Click the link above to view the video)*
 
 ---
 
