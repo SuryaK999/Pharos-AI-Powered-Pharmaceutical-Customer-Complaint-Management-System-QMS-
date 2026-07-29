@@ -23,6 +23,41 @@
 
 <br />
 
+## 📽️ Demo & Walkthrough
+
+> **Reviewers:** Please watch the video deliverables below for a complete demonstration of the Product Thinking and technical implementation behind Pharos.
+
+### Part 1: Product Demonstration & UX Workflow (5 mins)
+*A complete demonstration of the live dashboard, AI extraction, real-time SSE progress, and ICH Q9 Risk generation.*
+
+<video src="./pharos_demo-1.mp4" controls="controls" width="100%">
+  Your browser does not support the video tag.
+</video>
+
+### Part 2: Technical Code Walkthrough & Architecture (5 mins)
+*An architectural deep dive into the FastAPI backend, LangGraph state engine, Redux state management, and PostgreSQL persistence.*
+
+<video src="./pharos_demo-2.mp4" controls="controls" width="100%">
+  Your browser does not support the video tag.
+</video>
+
+---
+
+## 🌟 App Showcase
+
+Here are some showcase images from the Pharos application:
+
+### Pharos Dashboard
+![Pharos Dashboard](./assets/pharos_dashboard.png)
+
+### Pharos AI Intake
+![Pharos AI Intake](./assets/pharos_ai_intake.png)
+
+### Pharos Risk Assessment
+![Pharos Risk Assessment](./assets/pharos_risk_assessment.png)
+
+---
+
 ## 📋 Table of Contents
 
 1. [🌟 Origin & Philosophy](#-origin--philosophy)
@@ -36,15 +71,6 @@
 9. [🔌 API Reference](#-api-reference)
 10. [📂 Project Structure](#-project-structure)
 11. [🎬 Demo Walkthrough Guide](#-demo-walkthrough-guide)
-
----
-
-## 📽️ Demo & Walkthrough
-
-> **Reviewers:** Please watch the video deliverables below for a complete demonstration of the Product Thinking and technical implementation behind Pharos.
-
-- 🔗 **[Part 1: Product Demonstration & UX Workflow (5 mins)](./pharos_demo-1.mp4)** - *A complete demonstration of the live dashboard, AI extraction, real-time SSE progress, and ICH Q9 Risk generation.*
-- 🔗 **[Part 2: Technical Code Walkthrough & Architecture (5 mins)](./pharos_demo-2.mp4)** - *An architectural deep dive into the FastAPI backend, LangGraph state engine, Redux state management, and PostgreSQL persistence.*
 
 ---
 
