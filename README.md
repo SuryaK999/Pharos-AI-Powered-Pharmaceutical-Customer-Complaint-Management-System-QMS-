@@ -33,7 +33,7 @@ Here are some showcase images from the Pharos application:
 
 ![Pharos Dashboard](./assets/pharos_dashboard.png)
 
-### Pharos AI Intake
+### Pharos AI Copilot
 
 ![Pharos AI Intake](./assets/pharos_ai_intake.png)
 
