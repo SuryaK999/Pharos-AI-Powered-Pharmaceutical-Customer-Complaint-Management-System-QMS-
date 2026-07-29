@@ -25,18 +25,25 @@
 
 ---
 
-## 🌟 App Showcase
+## 🌟 Project Showcase
 
 Here are some showcase images from the Pharos application:
 
 ### Pharos Dashboard
+
 ![Pharos Dashboard](./assets/pharos_dashboard.png)
 
 ### Pharos AI Intake
+
 ![Pharos AI Intake](./assets/pharos_ai_intake.png)
 
 ### Pharos Risk Assessment
+
 ![Pharos Risk Assessment](./assets/pharos_risk_assessment.png)
+
+### Duplicate Detection
+
+![Duplicate Detection](./assets/pharos_duplicate_detection.png)
 
 ---
 
@@ -45,6 +52,7 @@ Here are some showcase images from the Pharos application:
 > **Reviewers:** Please watch the video deliverables below for a complete demonstration of the Product Thinking and technical implementation behind Pharos.
 
 ### Part 1: Product Demonstration & UX Workflow (5 mins)
+
 *A complete demonstration of the live dashboard, AI extraction, real-time SSE progress, and ICH Q9 Risk generation.*
 
 <video src="./pharos_demo-1.mp4" controls="controls" width="100%">
@@ -52,6 +60,7 @@ Here are some showcase images from the Pharos application:
 </video>
 
 ### Part 2: Technical Code Walkthrough & Architecture (5 mins)
+
 *An architectural deep dive into the FastAPI backend, LangGraph state engine, Redux state management, and PostgreSQL persistence.*
 
 <video src="./pharos_demo-2.mp4" controls="controls" width="100%">
@@ -80,7 +89,7 @@ Here are some showcase images from the Pharos application:
 
 ## 🌟 Origin & Philosophy
 
-The **Pharos of Alexandria** was the ancient world’s legendary lighthouse — a beacon of light keeping ships safe from hidden reefs. 
+The **Pharos of Alexandria** was the ancient world’s legendary lighthouse — a beacon of light keeping ships safe from hidden reefs.
 
 In pharmaceutical manufacturing, **customer complaints are early beacons of quality risk**. Pharos transforms raw customer communications (emails, letters, PDFs, transcripts) into actionable QMS intelligence before minor deviations escalate into patient harm, adverse events, or major regulatory actions.
 
@@ -105,7 +114,7 @@ In pharmaceutical manufacturing, **customer complaints are early beacons of qual
 Pharos is designed from the ground up to comply with global pharmaceutical quality standards:
 
 | Regulation / Guidance | Subject Area | Implementation in Pharos |
-|---|---|---|
+| --- | --- | --- |
 | **ICH Q9** | Quality Risk Management | Automated 5×5 Risk Matrix scoring (Severity × Probability), level categorization (Low, Medium, High, Critical), and risk rationale generation. |
 | **21 CFR 211.198** | Customer Complaint Files | Standardized complaint record schema, mandatory field completeness auditing, and activity audit trails. |
 | **EU GMP Chapter 8** | Complaints, Quality Defects & Recalls | End-to-end lifecycle workflow tracking (`Draft` $\rightarrow$ `Submitted` $\rightarrow$ `Under Review` $\rightarrow$ `Investigation` $\rightarrow$ `CAPA` $\rightarrow$ `Closed`). |
@@ -165,6 +174,7 @@ Pharos is designed from the ground up to comply with global pharmaceutical quali
 ### End-to-End Technical Workflow
 
 The following traces the explicit path a complaint takes through the system architecture:
+
 1. **Input**: A QA Officer uploads a raw `.eml` or `.pdf` file (or types a message) in the React frontend.
 2. **FastAPI Endpoint**: The request hits `POST /api/ai/process-file` which triggers the LangGraph orchestration.
 3. **LangGraph Nodes**: The unstructured data flows through 7 specialized AI nodes, streaming intermediate structured JSON chunks via Server-Sent Events (SSE) back to the client.
@@ -176,6 +186,7 @@ The following traces the explicit path a complaint takes through the system arch
 ## 🛠 Tech Stack
 
 ### **Backend**
+
 - **Framework**: FastAPI 0.115 (Clean Architecture, RESTful patterns)
 - **Orchestration**: LangGraph 0.2.60
 - **LLM Engine**: Groq Client (`gemma2-9b-it` & `llama-3.3-70b-versatile`)
@@ -183,6 +194,7 @@ The following traces the explicit path a complaint takes through the system arch
 - **Document Parsers**: PyPDF (`pypdf` 5.1), Python Standard Library `email`
 
 ### **Frontend**
+
 - **Framework**: React 18 + Vite 6
 - **State Management**: Redux Toolkit 2.5 (`complaints` and `intake` slices)
 - **Routing**: React Router DOM v7
@@ -194,6 +206,7 @@ The following traces the explicit path a complaint takes through the system arch
 ## 🚀 Quickstart & Installation
 
 ### Prerequisites
+
 - Node.js v18+
 - Python 3.10+
 - Groq API Key ([Get a free key here](https://console.groq.com/))
@@ -244,7 +257,7 @@ data: {"type": "done"}
 ## 🔌 API Reference
 
 | Endpoint | Method | Description |
-|---|---|---|
+| --- | --- | --- |
 | `/api/health` | `GET` | Health check and active AI models status |
 | `/api/ai/process-text` | `POST` | Process raw complaint text via LangGraph SSE stream |
 | `/api/ai/process-file` | `POST` | Process uploaded PDF/EML/TXT file via LangGraph SSE stream |
